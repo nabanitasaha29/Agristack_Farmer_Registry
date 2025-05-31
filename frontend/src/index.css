@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+
+.next-button {
+  background-color: green !important;
+}
+.next-button:hover {
+  background-color: rgb(0, 128, 0) !important;
+}
+
+.next-draft {
+  background-color: gray !important;
+}
+.next-draft:hover {
+  background-color: rgb(128, 128, 128) !important;
+}
+
+.next-restart {
+  background-color: red !important;
+}
+.next-restart:hover {
+  background-color: rgb(255, 0, 0) !important;
+}

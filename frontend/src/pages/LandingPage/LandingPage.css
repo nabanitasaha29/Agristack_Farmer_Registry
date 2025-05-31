@@ -1,0 +1,22 @@
+/* LandingPage.css */
+
+.landing-page-container {
+  text-align: center;
+  padding: 5px;
+  background-color: white;
+  max-width: 98%;
+  margin: 10px auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.landing-page-title {
+  color: #2c3e50;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.landing-page-description {
+  color: #7f8c8d;
+  font-size: 1.2em;
+}
