@@ -1,27 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col } from "antd";
 import axios from "axios";
+import dayjs from "dayjs";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 const { Option } = Select;
 
 const DemographicForm = ({ onSubmit }) => {
   const [form] = Form.useForm();
   const [levels, setLevels] = useState([]);
+  const [countryCode, setCountryCode] = useState(null);
 
-  // Fetch the hierarchy levels from your local API on component mount
+  // Fetch the hierarchy levels AND countryCode from your API on mount
   useEffect(() => {
     const fetchHierarchy = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/api/location/hierarchy"
         );
-        // Assuming API response structure: { hierarchy: [...] }
-        if (response.data && response.data.hierarchy) {
-          // Sort by level_order (snake_case) for consistent order
-          const sortedLevels = response.data.hierarchy.sort(
-            (a, b) => a.level_order - b.level_order
-          );
-          setLevels(sortedLevels);
+        // Assuming response like:
+        // { countryCode: "NG", hierarchy: [...] }
+        if (response.data) {
+          const { countryCode, hierarchy } = response.data;
+          setCountryCode(countryCode);
+
+          if (hierarchy) {
+            const sortedLevels = hierarchy.sort(
+              (a, b) => a.level_order - b.level_order
+            );
+            setLevels(sortedLevels);
+          }
         }
       } catch (error) {
         console.error("Error fetching location hierarchy:", error);
@@ -61,7 +69,26 @@ const DemographicForm = ({ onSubmit }) => {
           <Form.Item
             name="fr_dob"
             label="Date of Birth"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+              {
+                validator: (_, value) => {
+                  if (!value) {
+                    return Promise.reject(
+                      new Error("Please select your date of birth")
+                    );
+                  }
+                  const today = dayjs();
+                  const age = today.diff(value, "year");
+                  if (age >= 18) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("You must be at least 18 years old")
+                  );
+                },
+              },
+            ]}
           >
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
@@ -92,12 +119,37 @@ const DemographicForm = ({ onSubmit }) => {
           </Form.Item>
         </Col>
         <Col span={12}>
+          {/* Mobile Number with validation based on fetched countryCode */}
           <Form.Item
             name="fr_mobile_number"
-            label="Mobile Number"
-            rules={[{ required: true }]}
+            label={`Mobile Number (${countryCode || "country not loaded"})`}
+            rules={[
+              { required: true },
+              {
+                validator: (_, value) => {
+                  if (!value) {
+                    return Promise.reject(
+                      new Error("Please enter mobile number")
+                    );
+                  }
+                  if (!countryCode) {
+                    return Promise.reject(
+                      new Error("Country code not loaded yet")
+                    );
+                  }
+                  if (isValidPhoneNumber(value, countryCode)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(
+                      `Please enter a valid phone number for country code ${countryCode}`
+                    )
+                  );
+                },
+              },
+            ]}
           >
-            <Input />
+            <Input placeholder="Enter mobile number" />
           </Form.Item>
         </Col>
       </Row>
@@ -137,7 +189,7 @@ const DemographicForm = ({ onSubmit }) => {
         </Col>
       </Row>
 
-      {/* Dynamically render inputs for location hierarchy */}
+      {/* Render inputs dynamically for location hierarchy */}
       {levels.map(({ level_order, level_name }) => (
         <Row gutter={16} key={level_order}>
           <Col span={8}>
@@ -147,13 +199,13 @@ const DemographicForm = ({ onSubmit }) => {
               rules={[{ required: true }]}
             >
               <Select placeholder={`Select a ${level_name}`}>
-                {/* Dummy options for demonstration, replace with real options */}
-                <Option
-                  value={`${level_name}_Option1`}
-                >{`${level_name} Option 1`}</Option>
-                <Option
-                  value={`${level_name}_Option2`}
-                >{`${level_name} Option 2`}</Option>
+                {/* Replace these options with actual API data as needed */}
+                <Option value={`${level_name}_Option1`}>
+                  {`${level_name} Option 1`}
+                </Option>
+                <Option value={`${level_name}_Option2`}>
+                  {`${level_name} Option 2`}
+                </Option>
               </Select>
             </Form.Item>
           </Col>

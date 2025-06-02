@@ -12,6 +12,8 @@
   "dependencies": {
     "antd": "^5.25.4",
     "axios": "^1.9.0",
+    "dayjs": "^1.11.13",
+    "libphonenumber-js": "^1.12.8",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
