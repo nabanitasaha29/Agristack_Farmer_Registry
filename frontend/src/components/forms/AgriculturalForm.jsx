@@ -13,11 +13,19 @@ const AgriculturalForm = ({ onSubmit }) => {
   return (
     <Form form={form} layout="vertical" onFinish={handleFinish}>
       <h2>Agricultural Details</h2>
-      <Form.Item name="crop_type" label="Crop Type" rules={[{ required: true }]}>
+      <Form.Item
+        name="crop_type"
+        label="Crop Type"
+        rules={[{ required: true }]}
+      >
         <Input />
       </Form.Item>
 
-      <Form.Item name="fr_farmer_type" label="Farmer Type" rules={[{ required: true }]}>
+      <Form.Item
+        name="fr_farmer_type"
+        label="Farmer Type"
+        rules={[{ required: true }]}
+      >
         <Select>
           <Option value="Small">Small</Option>
           <Option value="Medium">Medium</Option>
@@ -25,15 +33,27 @@ const AgriculturalForm = ({ onSubmit }) => {
         </Select>
       </Form.Item>
 
-      <Form.Item name="fr_farmer_category" label="Farmer Category" rules={[{ required: true }]}>
+      <Form.Item
+        name="fr_farmer_category"
+        label="Farmer Category"
+        rules={[{ required: true }]}
+      >
         <Input />
       </Form.Item>
 
-      <Form.Item name="fr_total_land_area_owned" label="Total Land Area Owned" rules={[{ required: true }]}>
+      <Form.Item
+        name="fr_total_land_area_owned"
+        label="Total Land Area Owned"
+        rules={[{ required: true }]}
+      >
         <InputNumber style={{ width: "100%" }} />
       </Form.Item>
 
-      <Form.Item name="fr_no_of_lands_owned" label="Number of Lands Owned" rules={[{ required: true }]}>
+      <Form.Item
+        name="fr_no_of_lands_owned"
+        label="Number of Lands Owned"
+        rules={[{ required: true }]}
+      >
         <InputNumber style={{ width: "100%" }} />
       </Form.Item>
 
