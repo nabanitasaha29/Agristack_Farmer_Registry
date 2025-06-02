@@ -1,22 +1,30 @@
-import React from "react";
-import {
-  Form,
-  Input,
-  InputNumber,
-  DatePicker,
-  Select,
-  Button,
-  Row,
-  Col,
-} from "antd";
+import React, { useState } from "react";
+import { Form, Input, DatePicker, Select, Button, Row, Col } from "antd";
+import axios from "axios";
 
 const { Option } = Select;
 
 const DemographicForm = ({ onSubmit }) => {
   const [form] = Form.useForm();
+  const [levels, setLevels] = useState([]);
 
   const handleFinish = (values) => {
     onSubmit(values);
+  };
+
+  const handleCountryChange = async (value) => {
+    try {
+      // Fetch levels based on selected country
+      const response = await axios.post(
+        "https://developer.agristack.gov.in/n8n/webhook/get-country",
+        { country_name: value }
+      );
+      setLevels(response.data);
+      // Reset location fields when country changes
+      form.resetFields(["locationLevels"]);
+    } catch (error) {
+      console.error("Error fetching location levels:", error);
+    }
   };
 
   return (
@@ -118,12 +126,51 @@ const DemographicForm = ({ onSubmit }) => {
             <Input />
           </Form.Item>
         </Col>
+
         <Col span={8}>
-          <Form.Item name="fr_country" label="Country" initialValue="India">
-            <Input disabled />
+          <Form.Item
+            name="fr_country"
+            label="Country"
+            initialValue="India"
+            rules={[{ required: true }]}
+          >
+            <Select
+              placeholder="Select a country"
+              onChange={handleCountryChange}
+            >
+              <Option value="Nigeria">Nigeria</Option>
+              <Option value="Rwanda">Rwanda</Option>
+              <Option value="India">India</Option>
+              <Option value="Ethiopia">Ethiopia</Option>
+            </Select>
           </Form.Item>
         </Col>
       </Row>
+
+      {/* Render dynamic levels */}
+      {levels
+        .sort((a, b) => a.level_order - b.level_order)
+        .map((level) => (
+          <Row gutter={16} key={level.location_id}>
+            <Col span={8}>
+              <Form.Item
+                name={["locationLevels", `level_${level.level_order}`]}
+                label={level.level_name}
+                rules={[{ required: true }]}
+              >
+                <Select placeholder={`Select a ${level.level_name}`}>
+                  {/* Replace the following with dynamic options fetched per level */}
+                  <Option value={`${level.level_name}_Option1`}>
+                    {`${level.level_name} Option1`}
+                  </Option>
+                  <Option value={`${level.level_name}_Option2`}>
+                    {`${level.level_name} Option2`}
+                  </Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        ))}
 
       <Button className="next-button" type="primary" htmlType="submit">
         Next
