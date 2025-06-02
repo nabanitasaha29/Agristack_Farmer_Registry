@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col } from "antd";
 import axios from "axios";
 
@@ -8,28 +8,37 @@ const DemographicForm = ({ onSubmit }) => {
   const [form] = Form.useForm();
   const [levels, setLevels] = useState([]);
 
+  // Fetch the hierarchy levels from your local API on component mount
+  useEffect(() => {
+    const fetchHierarchy = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/location/hierarchy"
+        );
+        // Assuming API response structure: { hierarchy: [...] }
+        if (response.data && response.data.hierarchy) {
+          // Sort by level_order (snake_case) for consistent order
+          const sortedLevels = response.data.hierarchy.sort(
+            (a, b) => a.level_order - b.level_order
+          );
+          setLevels(sortedLevels);
+        }
+      } catch (error) {
+        console.error("Error fetching location hierarchy:", error);
+      }
+    };
+
+    fetchHierarchy();
+  }, []);
+
   const handleFinish = (values) => {
     onSubmit(values);
-  };
-
-  const handleCountryChange = async (value) => {
-    try {
-      // Fetch levels based on selected country
-      const response = await axios.post(
-        "https://developer.agristack.gov.in/n8n/webhook/get-country",
-        { country_name: value }
-      );
-      setLevels(response.data);
-      // Reset location fields when country changes
-      form.resetFields(["locationLevels"]);
-    } catch (error) {
-      console.error("Error fetching location levels:", error);
-    }
   };
 
   return (
     <Form form={form} layout="vertical" onFinish={handleFinish}>
       <h2>Demographic Details</h2>
+
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
@@ -126,51 +135,30 @@ const DemographicForm = ({ onSubmit }) => {
             <Input />
           </Form.Item>
         </Col>
-
-        <Col span={8}>
-          <Form.Item
-            name="fr_country"
-            label="Country"
-            initialValue="India"
-            rules={[{ required: true }]}
-          >
-            <Select
-              placeholder="Select a country"
-              onChange={handleCountryChange}
-            >
-              <Option value="Nigeria">Nigeria</Option>
-              <Option value="Rwanda">Rwanda</Option>
-              <Option value="India">India</Option>
-              <Option value="Ethiopia">Ethiopia</Option>
-            </Select>
-          </Form.Item>
-        </Col>
       </Row>
 
-      {/* Render dynamic levels */}
-      {levels
-        .sort((a, b) => a.level_order - b.level_order)
-        .map((level) => (
-          <Row gutter={16} key={level.location_id}>
-            <Col span={8}>
-              <Form.Item
-                name={["locationLevels", `level_${level.level_order}`]}
-                label={level.level_name}
-                rules={[{ required: true }]}
-              >
-                <Select placeholder={`Select a ${level.level_name}`}>
-                  {/* Replace the following with dynamic options fetched per level */}
-                  <Option value={`${level.level_name}_Option1`}>
-                    {`${level.level_name} Option1`}
-                  </Option>
-                  <Option value={`${level.level_name}_Option2`}>
-                    {`${level.level_name} Option2`}
-                  </Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-        ))}
+      {/* Dynamically render inputs for location hierarchy */}
+      {levels.map(({ level_order, level_name }) => (
+        <Row gutter={16} key={level_order}>
+          <Col span={8}>
+            <Form.Item
+              name={["locationLevels", `level_${level_order}`]}
+              label={level_name}
+              rules={[{ required: true }]}
+            >
+              <Select placeholder={`Select a ${level_name}`}>
+                {/* Dummy options for demonstration, replace with real options */}
+                <Option
+                  value={`${level_name}_Option1`}
+                >{`${level_name} Option 1`}</Option>
+                <Option
+                  value={`${level_name}_Option2`}
+                >{`${level_name} Option 2`}</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+      ))}
 
       <Button className="next-button" type="primary" htmlType="submit">
         Next
