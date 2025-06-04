@@ -1,12 +1,20 @@
-import React from "react";
+import React, { forwardRef, useEffect } from "react";
 import { Form, Input, InputNumber, Select, Button } from "antd";
 
 const { Option } = Select;
 
-const AgriculturalForm = ({ onSubmit, onFinalAction, initialValues }) => {
+const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues }, ref) => {
   const [form] = Form.useForm();
 
-  React.useEffect(() => {
+  // Expose form methods via ref
+  React.useImperativeHandle(ref, () => ({
+    submit: () => form.submit(),
+    validateFields: () => form.validateFields(),
+    getFieldsValue: () => form.getFieldsValue(),
+  }));
+
+  useEffect(() => {
+    form.resetFields();
     form.setFieldsValue(initialValues);
   }, [initialValues, form]);
 
@@ -91,6 +99,6 @@ const AgriculturalForm = ({ onSubmit, onFinalAction, initialValues }) => {
       </div>
     </Form>
   );
-};
+});
 
 export default AgriculturalForm;

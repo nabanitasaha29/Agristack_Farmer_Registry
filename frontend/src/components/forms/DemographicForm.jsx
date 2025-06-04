@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col } from "antd";
 import dayjs from "dayjs";
 import { isValidPhoneNumber } from "libphonenumber-js";
@@ -6,13 +6,11 @@ import LocationSelector from "../LocationSelector";
 
 const { Option } = Select;
 
-const DemographicForm = ({ onSubmit, initialValues }) => {
+const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   const [form] = Form.useForm();
   const [countryCode, setCountryCode] = useState(null);
   const [mobileCode, setMobileCode] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(
-    initialValues.selectedLocation || {}
-  );
+  const [selectedLocation, setSelectedLocation] = useState(initialValues.selectedLocation || {});
 
   useEffect(() => {
     form.setFieldsValue(initialValues);
@@ -136,7 +134,6 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={12}>
-          {/* Mobile Number with validation based on fetched countryCode */}
           <Form.Item
             name="fr_mobile_number"
             label={`Mobile Number (${countryCode || "country not loaded"})`}
@@ -151,9 +148,8 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
                   if (!mobileCode || !countryCode) {
                     return Promise.reject("Codes not loaded yet");
                   }
-                  //Add + before mobileCode to make full international number
                   const fullNumber = `+${mobileCode}${trimmedValue}`;
-
+                
                   // validate using full international format
                   if (isValidPhoneNumber(fullNumber)) {
                     return Promise.resolve();
@@ -222,7 +218,6 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
         </Col>
       </Row>
 
-      {/* Calling reusable Location Selector for Dropdowns */}
       <LocationSelector
         form={form}
         fieldNamePrefix="demographicInfo"
@@ -234,6 +229,6 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
       </Button>
     </Form>
   );
-};
+});
 
 export default DemographicForm;

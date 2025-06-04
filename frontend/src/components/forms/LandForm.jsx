@@ -1,14 +1,21 @@
-import { useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 import { Form, Input, InputNumber, Button, Row, Col } from "antd";
 import LocationSelector from "../LocationSelector";
 import axios from "axios";
 
-const LandForm = ({ onSubmit, initialValues }) => {
+const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   const [form] = Form.useForm();
   const [landLocation, setLandLocation] = useState(
     initialValues.landLocation || {}
   );
   const [areaUnit, setAreaUnit] = useState("");
+
+  // Expose form methods via ref
+   React.useImperativeHandle(ref, () => ({
+    submit: () => form.submit(),
+    validateFields: () => form.validateFields(),
+    getFieldsValue: () => form.getFieldsValue(),
+  }));
 
   useEffect(() => {
     form.setFieldsValue(initialValues);
@@ -46,7 +53,7 @@ const LandForm = ({ onSubmit, initialValues }) => {
       initialValues={initialValues}
     >
       <h2>Land Details</h2>
-      {/* Calling reusable Location Selector for Dropdowns */}
+      
       <LocationSelector
         form={form}
         fieldNamePrefix="landLocationLevels"
@@ -97,6 +104,6 @@ const LandForm = ({ onSubmit, initialValues }) => {
       </Button>
     </Form>
   );
-};
+});
 
 export default LandForm;
