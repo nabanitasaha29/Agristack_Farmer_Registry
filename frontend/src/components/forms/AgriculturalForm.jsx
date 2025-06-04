@@ -3,15 +3,19 @@ import { Form, Input, InputNumber, Select, Button } from "antd";
 
 const { Option } = Select;
 
-const AgriculturalForm = ({ onSubmit, onFinalAction }) => {
+const AgriculturalForm = ({ onSubmit, onFinalAction, initialValues }) => {
   const [form] = Form.useForm();
+
+  React.useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [initialValues, form]);
 
   const handleFinish = (values) => {
     onSubmit(values);
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish}>
+    <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues}>
       <h2>Agricultural Details</h2>
 
       <Form.Item

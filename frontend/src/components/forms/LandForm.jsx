@@ -2,11 +2,15 @@ import { useState, useEffect } from "react";
 import { Form, Input, InputNumber, Button, Row, Col } from "antd";
 import LocationSelector from "../LocationSelector";
 import axios from "axios";
-const LandForm = ({ onSubmit }) => {
-  const [form] = Form.useForm();
-  const [landLocation, setLandLocation] = useState({});
 
+const LandForm = ({ onSubmit, initialValues }) => {
+  const [form] = Form.useForm();
+  const [landLocation, setLandLocation] = useState(initialValues.landLocation || {});
   const [areaUnit, setAreaUnit] = useState("");
+
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [initialValues, form]);
 
   useEffect(() => {
     const fetchAreaUnit = async () => {
@@ -31,7 +35,7 @@ const LandForm = ({ onSubmit }) => {
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish}>
+    <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues}>
       <h2>Land Details</h2>
       {/* Calling reusable Location Selector for Dropdowns */}
       <LocationSelector

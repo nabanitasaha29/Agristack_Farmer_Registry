@@ -6,27 +6,15 @@ import LocationSelector from "../LocationSelector";
 
 const { Option } = Select;
 
-const DemographicForm = ({ onSubmit }) => {
+const DemographicForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
-
   const [countryCode, setCountryCode] = useState(null);
   const [mobileCode, setMobileCode] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState({});
+  const [selectedLocation, setSelectedLocation] = useState(initialValues.selectedLocation || {});
 
-  // useEffect(() => {
-  //   fetch("http://localhost:5000/api/location/active-country") // Made new Endpoint in backend to get country code for Mobile number
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       if (data.countryCode) {
-  //         setCountryCode(data.countryCode);
-  //       } else {
-  //         setCountryCode("IN"); // fallback
-  //       }
-  //     })
-  //     .catch(() => {
-  //       setCountryCode("IN"); // fallback on error
-  //     });
-  // }, []);
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [initialValues, form]);
 
   useEffect(() => {
     const fetchCountryAndMobileCode = async () => {
@@ -63,8 +51,10 @@ const DemographicForm = ({ onSubmit }) => {
       selectedLocation: selectedLocation,
     });
   };
+
+
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish}>
+    <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues}>
       <h2>Demographic Details</h2>
 
       <Row gutter={16}>

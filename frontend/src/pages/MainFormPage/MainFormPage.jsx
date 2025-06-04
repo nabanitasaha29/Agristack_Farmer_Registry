@@ -18,16 +18,17 @@ const MainFormPage = () => {
     setFormData((prev) => ({ ...prev, demographic: data }));
     setActiveTab(2);
   };
+
   const handleLandSubmit = (data) => {
     setFormData((prev) => ({ ...prev, land: data }));
     setActiveTab(3);
   };
+
   const handleAgriculturalSubmit = (data) => {
     setFormData((prev) => ({ ...prev, agricultural: data }));
   };
 
   const handleFinalAction = (action) => {
-    console.log("📦 Final Form Data:", formData);
     if (action === "submit")
       alert("Form submitted: " + JSON.stringify(formData));
     else if (action === "draft")
@@ -43,13 +44,22 @@ const MainFormPage = () => {
       <TabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="form-content">
         {activeTab === 1 && (
-          <DemographicForm onSubmit={handleDemographicSubmit} />
+          <DemographicForm 
+            onSubmit={handleDemographicSubmit}
+            initialValues={formData.demographic}
+          />
         )}
-        {activeTab === 2 && <LandForm onSubmit={handleLandSubmit} />}
+        {activeTab === 2 && (
+          <LandForm 
+            onSubmit={handleLandSubmit}
+            initialValues={formData.land}
+          />
+        )}
         {activeTab === 3 && (
           <AgriculturalForm
             onSubmit={handleAgriculturalSubmit}
             onFinalAction={handleFinalAction}
+            initialValues={formData.agricultural}
           />
         )}
       </div>
