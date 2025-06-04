@@ -5,3 +5,21 @@ export const rwandaHierarchy = [
   { levelOrder: 4, levelName: "Cell", parentLevel: "Sector" },
   { levelOrder: 5, levelName: "Village", parentLevel: "Cell" },
 ];
+export const rwandaConfig = {
+  areaUnit: "acres",
+  mobileCode: "250",
+  tableName: "rwanda_location_data",
+  columns: {
+    Province: "province_name",
+    District: "district_name",
+    Sector: "sector_name",
+    Cell: "cell_name",
+    Village: "village_name",
+  },
+  parentColumns: {
+    District: "province_name",
+    Sector: "district_name",
+    Cell: "sector_name",
+    Village: "cell_name",
+  },
+};

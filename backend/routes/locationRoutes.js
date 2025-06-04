@@ -1,6 +1,8 @@
 import express from "express";
 
 import { getLocationHierarchy } from "../services/locationService.js";
+import { getLocationData } from "../services/locationService.js";
+import { countryConfigs } from "../config/index.js";
 
 const router = express.Router();
 
@@ -14,6 +16,54 @@ router.get("/hierarchy", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch hierarchy" });
   }
+});
+
+//Data for Dropdowns
+router.get("/location-options", async (req, res) => {
+  try {
+    const { levelName, parentValue } = req.query;
+
+    if (!levelName) {
+      return res.status(400).json({ error: "Missing levelName query param" });
+    }
+
+    const options = await getLocationData(levelName, parentValue);
+    res.json({ countryCode: process.env.ACTIVE_COUNTRY || "IN", options });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// To get country code for Mobile number in DemographicFrom
+router.get("/active-country", (req, res) => {
+  res.json({ countryCode: process.env.ACTIVE_COUNTRY || "IN" });
+});
+
+router.get("/mobile-code", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.mobileCode) {
+    return res
+      .status(404)
+      .json({ error: "Mobile code not found for active country" });
+  }
+
+  res.json({ mobileCode: config.mobileCode });
+});
+
+// To get area unit
+router.get("/area-unit", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.areaUnit) {
+    return res
+      .status(404)
+      .json({ error: "Area unit not found for active country" });
+  }
+
+  res.json({ areaUnit: config.areaUnit });
 });
 
 export default router;

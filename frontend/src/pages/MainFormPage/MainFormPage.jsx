@@ -17,12 +17,12 @@ const MainFormPage = () => {
     setFormData((prev) => ({ ...prev, demographic: data }));
     setActiveTab(2);
   };
-  const handleAgriculturalSubmit = (data) => {
-    setFormData((prev) => ({ ...prev, agricultural: data }));
-    setActiveTab(3);
-  };
   const handleLandSubmit = (data) => {
     setFormData((prev) => ({ ...prev, land: data }));
+    setActiveTab(3);
+  };
+  const handleAgriculturalSubmit = (data) => {
+    setFormData((prev) => ({ ...prev, agricultural: data }));
   };
 
   const handleFinalAction = (action) => {
@@ -38,18 +38,15 @@ const MainFormPage = () => {
 
   return (
     <div className="main-form-container">
-      
       <TabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="form-content">
         {activeTab === 1 && (
           <DemographicForm onSubmit={handleDemographicSubmit} />
         )}
-        {activeTab === 2 && (
-          <AgriculturalForm onSubmit={handleAgriculturalSubmit} />
-        )}
+        {activeTab === 2 && <LandForm onSubmit={handleLandSubmit} />}
         {activeTab === 3 && (
-          <LandForm
-            onSubmit={handleLandSubmit}
+          <AgriculturalForm
+            onSubmit={handleAgriculturalSubmit}
             onFinalAction={handleFinalAction}
           />
         )}

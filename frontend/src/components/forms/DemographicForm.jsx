@@ -1,48 +1,68 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col } from "antd";
-import axios from "axios";
 import dayjs from "dayjs";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import LocationSelector from "../LocationSelector";
 
 const { Option } = Select;
 
 const DemographicForm = ({ onSubmit }) => {
   const [form] = Form.useForm();
-  const [levels, setLevels] = useState([]);
+
   const [countryCode, setCountryCode] = useState(null);
+  const [mobileCode, setMobileCode] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState({});
 
-  // Fetch the hierarchy levels AND countryCode from your API on mount
+  // useEffect(() => {
+  //   fetch("http://localhost:5000/api/location/active-country") // Made new Endpoint in backend to get country code for Mobile number
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (data.countryCode) {
+  //         setCountryCode(data.countryCode);
+  //       } else {
+  //         setCountryCode("IN"); // fallback
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setCountryCode("IN"); // fallback on error
+  //     });
+  // }, []);
+
   useEffect(() => {
-    const fetchHierarchy = async () => {
+    const fetchCountryAndMobileCode = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/location/hierarchy"
+        const countryRes = await fetch(
+          "http://localhost:5000/api/location/active-country"
         );
-        // Assuming response like:
-        // { countryCode: "NG", hierarchy: [...] }
-        if (response.data) {
-          const { countryCode, hierarchy } = response.data;
-          setCountryCode(countryCode);
+        const countryData = await countryRes.json();
+        const code = countryData.countryCode || "IN";
+        setCountryCode(code);
 
-          if (hierarchy) {
-            const sortedLevels = hierarchy.sort(
-              (a, b) => a.level_order - b.level_order
-            );
-            setLevels(sortedLevels);
-          }
+        const mobileRes = await fetch(
+          "http://localhost:5000/api/location/mobile-code"
+        );
+        const mobileData = await mobileRes.json();
+        if (mobileData.mobileCode) {
+          setMobileCode(mobileData.mobileCode);
         }
       } catch (error) {
-        console.error("Error fetching location hierarchy:", error);
+        console.error("Error fetching country or mobile code:", error);
+        setCountryCode("IN");
       }
     };
 
-    fetchHierarchy();
+    fetchCountryAndMobileCode();
   }, []);
 
   const handleFinish = (values) => {
-    onSubmit(values);
-  };
+    const fullNumber = `+${mobileCode}${values.fr_mobile_number}`;
 
+    onSubmit({
+      ...values,
+      fr_mobile_number: fullNumber,
+      selectedLocation: selectedLocation,
+    });
+  };
   return (
     <Form form={form} layout="vertical" onFinish={handleFinish}>
       <h2>Demographic Details</h2>
@@ -127,29 +147,32 @@ const DemographicForm = ({ onSubmit }) => {
               { required: true },
               {
                 validator: (_, value) => {
-                  if (!value) {
-                    return Promise.reject(
-                      new Error("Please enter mobile number")
-                    );
+                  const trimmedValue = value?.toString().trim();
+                  if (!trimmedValue) {
+                    return Promise.reject("Please enter mobile number");
                   }
-                  if (!countryCode) {
-                    return Promise.reject(
-                      new Error("Country code not loaded yet")
-                    );
+                  if (!mobileCode || !countryCode) {
+                    return Promise.reject("Codes not loaded yet");
                   }
-                  if (isValidPhoneNumber(value, countryCode)) {
+                  //Add + before mobileCode to make full international number
+                  const fullNumber = `+${mobileCode}${trimmedValue}`;
+                
+                  // validate using full international format
+                  if (isValidPhoneNumber(fullNumber)) {
                     return Promise.resolve();
                   }
+
                   return Promise.reject(
-                    new Error(
-                      `Please enter a valid phone number for country code ${countryCode}`
-                    )
+                    `Please enter a valid phone number for country code ${countryCode}`
                   );
                 },
               },
             ]}
           >
-            <Input placeholder="Enter mobile number" />
+            <Input
+              addonBefore={"+" + mobileCode || "+__"}
+              placeholder="Enter mobile number (without country code)"
+            />
           </Form.Item>
         </Col>
       </Row>
@@ -189,28 +212,12 @@ const DemographicForm = ({ onSubmit }) => {
         </Col>
       </Row>
 
-      {/* Render inputs dynamically for location hierarchy */}
-      {levels.map(({ level_order, level_name }) => (
-        <Row gutter={16} key={level_order}>
-          <Col span={8}>
-            <Form.Item
-              name={["locationLevels", `level_${level_order}`]}
-              label={level_name}
-              rules={[{ required: true }]}
-            >
-              <Select placeholder={`Select a ${level_name}`}>
-                {/* Replace these options with actual API data as needed */}
-                <Option value={`${level_name}_Option1`}>
-                  {`${level_name} Option 1`}
-                </Option>
-                <Option value={`${level_name}_Option2`}>
-                  {`${level_name} Option 2`}
-                </Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-      ))}
+      {/* Calling reusable Location Selector for Dropdowns */}
+      <LocationSelector
+        form={form}
+        fieldNamePrefix="demographicInfo"
+        onSelectionChange={setSelectedLocation}
+      />
 
       <Button className="next-button" type="primary" htmlType="submit">
         Next
