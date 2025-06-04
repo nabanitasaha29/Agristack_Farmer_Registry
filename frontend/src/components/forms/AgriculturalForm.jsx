@@ -7,7 +7,6 @@ const AgriculturalForm = ({ onSubmit, onFinalAction }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values) => {
-    console.log("Form Submitted Values:", values);
     onSubmit(values);
   };
 

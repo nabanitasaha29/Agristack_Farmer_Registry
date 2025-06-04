@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./MainFormPage.css";
+import axios from "axios";
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
@@ -26,6 +27,7 @@ const MainFormPage = () => {
   };
 
   const handleFinalAction = (action) => {
+    console.log("📦 Final Form Data:", formData);
     if (action === "submit")
       alert("Form submitted: " + JSON.stringify(formData));
     else if (action === "draft")

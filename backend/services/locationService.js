@@ -1,4 +1,6 @@
-import { pool } from "../config/db.js";
+// import { pool } from "../config/db.js";
+import pool from "../config/db.js";
+
 import { fallbackHierarchy, country, countryConfigs } from "../config/index.js"; // Import 'country' as active country
 
 export async function getLocationHierarchy() {
