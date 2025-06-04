@@ -5,7 +5,9 @@ import axios from "axios";
 
 const LandForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
-  const [landLocation, setLandLocation] = useState(initialValues.landLocation || {});
+  const [landLocation, setLandLocation] = useState(
+    initialValues.landLocation || {}
+  );
   const [areaUnit, setAreaUnit] = useState("");
 
   useEffect(() => {
@@ -28,14 +30,21 @@ const LandForm = ({ onSubmit, initialValues }) => {
   }, []);
 
   const handleFinish = (values) => {
+    console.log(values);
     onSubmit({
       ...values,
       landLocation: landLocation,
     });
+    console.log(values);
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues}>
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleFinish}
+      initialValues={initialValues}
+    >
       <h2>Land Details</h2>
       {/* Calling reusable Location Selector for Dropdowns */}
       <LocationSelector

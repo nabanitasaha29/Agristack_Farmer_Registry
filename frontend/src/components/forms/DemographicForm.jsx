@@ -10,7 +10,9 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
   const [countryCode, setCountryCode] = useState(null);
   const [mobileCode, setMobileCode] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(initialValues.selectedLocation || {});
+  const [selectedLocation, setSelectedLocation] = useState(
+    initialValues.selectedLocation || {}
+  );
 
   useEffect(() => {
     form.setFieldsValue(initialValues);
@@ -50,11 +52,16 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
       fr_mobile_number: fullNumber,
       selectedLocation: selectedLocation,
     });
+    console.log(values);
   };
 
-
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues}>
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleFinish}
+      initialValues={initialValues}
+    >
       <h2>Demographic Details</h2>
 
       <Row gutter={16}>
@@ -146,7 +153,7 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
                   }
                   //Add + before mobileCode to make full international number
                   const fullNumber = `+${mobileCode}${trimmedValue}`;
-                
+
                   // validate using full international format
                   if (isValidPhoneNumber(fullNumber)) {
                     return Promise.resolve();
@@ -167,8 +174,17 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
         </Col>
       </Row>
 
-      <Form.Item name="fr_id_proof_type" label="ID Proof Type">
-        <Input />
+      <Form.Item
+        name="fr_id_proof_type"
+        label="ID Proof Type"
+        rules={[{ required: true, message: "Please select ID Proof Type" }]}
+      >
+        <Select placeholder="Select ID Proof Type">
+          <Option value="Aadhaar">Aadhaar</Option>
+          <Option value="Voter ID">Voter ID</Option>
+          <Option value="Passport">Passport</Option>
+          <Option value="Driving License">Driving License</Option>
+        </Select>
       </Form.Item>
 
       <Form.Item name="fr_id_proof_number" label="ID Proof Number">
@@ -196,8 +212,12 @@ const DemographicForm = ({ onSubmit, initialValues }) => {
 
       <Row gutter={16}>
         <Col span={8}>
-          <Form.Item name="fr_postal_code" label="Postal Code">
-            <Input />
+          <Form.Item
+            name="fr_postal_code"
+            label="Postal Code"
+            rules={[{ required: true, message: "Postal Code is required" }]}
+          >
+            <Input placeholder="Enter postal code" />
           </Form.Item>
         </Col>
       </Row>

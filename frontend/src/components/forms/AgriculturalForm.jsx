@@ -12,10 +12,16 @@ const AgriculturalForm = ({ onSubmit, onFinalAction, initialValues }) => {
 
   const handleFinish = (values) => {
     onSubmit(values);
+    console.log(values);
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues}>
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleFinish}
+      initialValues={initialValues}
+    >
       <h2>Agricultural Details</h2>
 
       <Form.Item
