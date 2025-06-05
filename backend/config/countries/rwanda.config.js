@@ -9,6 +9,13 @@ export const rwandaConfig = {
   areaUnit: "acres",
   mobileCode: "250",
   tableName: "rwanda_location_data",
+  idProofTypes: [
+  { value: "NID", label: "National Identification Card" },
+  { value: "Passport", label: "Passport" },
+  { value: "DrivingLicense", label: "Driving License" },
+  { value: "VoterCard", label: "Voter's Card" }
+],
+
   columns: {
     Province: "province_name",
     District: "district_name",

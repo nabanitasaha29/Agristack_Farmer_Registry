@@ -11,6 +11,12 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   const [countryCode, setCountryCode] = useState(null);
   const [mobileCode, setMobileCode] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(initialValues.selectedLocation || {});
+  const [idProofTypes, setIdProofTypes] = useState([
+    { value: "Aadhaar", label: "Aadhaar" },
+    { value: "Voter ID", label: "Voter ID" },
+    { value: "Passport", label: "Passport" },
+    { value: "Driving License", label: "Driving License" }
+  ]);
 
   // Properly expose form methods via ref
   React.useImperativeHandle(ref, () => ({
@@ -45,6 +51,15 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
         const mobileData = await mobileRes.json();
         if (mobileData.mobileCode) {
           setMobileCode(mobileData.mobileCode);
+        }
+
+        // Fetch ID proof types based on country
+        const idProofRes = await fetch(
+          "http://localhost:5000/api/location/id-proof-types"
+        );
+        const idProofData = await idProofRes.json();
+        if (idProofData.idProofTypes) {
+          setIdProofTypes(idProofData.idProofTypes);
         }
       } catch (error) {
         console.error("Error fetching country or mobile code:", error);
@@ -215,10 +230,11 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
         }]}
       >
         <Select placeholder="Select ID Proof Type">
-          <Option value="Aadhaar">Aadhaar</Option>
-          <Option value="Voter ID">Voter ID</Option>
-          <Option value="Passport">Passport</Option>
-          <Option value="Driving License">Driving License</Option>
+          {idProofTypes.map((proofType) => (
+            <Option key={proofType.value} value={proofType.value}>
+              {proofType.label}
+            </Option>
+          ))}
         </Select>
       </Form.Item>
 

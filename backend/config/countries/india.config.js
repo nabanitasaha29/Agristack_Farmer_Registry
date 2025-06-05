@@ -8,6 +8,13 @@ export const indiaConfig = {
   areaUnit: "hectares",
   mobileCode: "91",
   tableName: "lgd_master",
+  idProofTypes: [
+    { value: "Aadhaar", label: "Aadhaar Card" },
+    { value: "PAN", label: "PAN Card" },
+    { value: "VoterID", label: "Voter ID" },
+    { value: "DrivingLicense", label: "Driving License" },
+    { value: "Passport", label: "Passport" }
+  ],
   columns: {
     State: "state_name",
     District: "district_name",

@@ -9,6 +9,13 @@ export const ethiopiaConfig = {
   areaUnit: "hectares",
   mobileCode: "251",
   tableName: "ethiopia_location_data",
+  idProofTypes: [
+  { value: "KebeleID", label: "Kebele ID Card" },
+  { value: "Passport", label: "Passport" },
+  { value: "DrivingLicense", label: "Driving License" },
+  { value: "VoterCard", label: "Voter's Card" }
+],
+
   columns: {
     Region: "region_name",
     Zone: "zone_name",

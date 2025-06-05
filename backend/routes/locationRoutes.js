@@ -66,4 +66,22 @@ router.get("/area-unit", (req, res) => {
   res.json({ areaUnit: config.areaUnit });
 });
 
+
+// Add this new route
+router.get("/id-proof-types", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.idProofTypes) {
+    return res
+      .status(404)
+      .json({ error: "ID proof types not found for active country" });
+  }
+
+  res.json({ 
+    countryCode: activeCountry,
+    idProofTypes: config.idProofTypes 
+  });
+});
+
 export default router;
