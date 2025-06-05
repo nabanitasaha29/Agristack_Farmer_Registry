@@ -8,22 +8,22 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: subtle shadow */
 }
 
-.tabs button {
+.tabs-button button {
   padding: 10px 20px;
   margin: 5px;
   border: none;
-  background: #eee;
+  background: #eee !important;
   cursor: pointer;
   border-radius: 5px;
 }
 
-.tabs button.active {
-  background: #4caf50;
+.tabs-button button.active {
+  background: #4caf50 !important;
   color: white;
 }
 
-.tabs button:disabled {
-  background: #ccc;
+.tabs-button button:disabled {
+  background: #ccc !important;
   cursor: not-allowed;
 }
 

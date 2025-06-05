@@ -1,3 +1,5 @@
+// testing
+
 import React, { useState, useRef } from "react";
 import moment from "moment";
 import "./MainFormPage.css";
@@ -9,34 +11,36 @@ import TabsNavigation from "../../components/TabsNavigation";
 import { message } from "antd";
 
 const MainFormPage = () => {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(1); // Tracks the current active tab
   const [formData, setFormData] = useState({
+    // Stores form data across tabs
     demographic: {},
     agricultural: {},
     land: {},
   });
 
   const formRefs = {
+    // Refs to access form methods from each form
     1: useRef(null),
     2: useRef(null),
-    3: useRef(null)
+    3: useRef(null),
   };
 
   const validateAndSaveCurrentForm = async () => {
     const currentFormRef = formRefs[activeTab];
     if (currentFormRef?.current) {
       try {
-        await currentFormRef.current.validateFields();
-        const formValues = currentFormRef.current.getFieldsValue();
-        setFormData(prev => ({
+        await currentFormRef.current.validateFields(); // Validate current form
+        const formValues = currentFormRef.current.getFieldsValue(); // Get current form values
+        setFormData((prev) => ({
           ...prev,
           ...(activeTab === 1 && { demographic: formValues }),
           ...(activeTab === 2 && { land: formValues }),
-          ...(activeTab === 3 && { agricultural: formValues })
+          ...(activeTab === 3 && { agricultural: formValues }),
         }));
         return true;
       } catch (error) {
-        message.error('Please fill all required fields before proceeding');
+        message.error("Please fill all required fields before proceeding");
         return false;
       }
     }
@@ -44,34 +48,35 @@ const MainFormPage = () => {
   };
 
   const handleTabChange = async (newTab) => {
-    const isValid = await validateAndSaveCurrentForm();
+    const isValid = await validateAndSaveCurrentForm(); // Save current tab before changing
     if (isValid) {
       setActiveTab(newTab);
     }
   };
 
+  // Handles submission of DemographicForm
   const handleDemographicSubmit = (data) => {
-    setFormData(prev => ({ ...prev, demographic: data }));
+    setFormData((prev) => ({ ...prev, demographic: data }));
     setActiveTab(2);
   };
 
+  // Handles submission of LandForm
   const handleLandSubmit = (data) => {
-    setFormData(prev => ({ ...prev, land: data }));
+    setFormData((prev) => ({ ...prev, land: data }));
     setActiveTab(3);
   };
 
+  // Handles submission of AgriculturalForm
   const handleAgriculturalSubmit = (data) => {
-    setFormData(prev => ({ ...prev, agricultural: data }));
+    setFormData((prev) => ({ ...prev, agricultural: data }));
   };
 
-  
-
-    const handleFinalAction = async (action) => {
+  const handleFinalAction = async (action) => {
     if (action === "submit") {
       const { demographic, land, agricultural } = formData;
 
-      const selectedLocation = demographic.selectedLocation || {};
-      const landLocation = land.landLocation || {};
+      const selectedLocation = demographic.selectedLocation || {}; // location from DemographicForm
+      const landLocation = land.landLocation || {}; // location from LandForm
 
       const demographicPayload = {
         fr_full_name: demographic.fr_full_name || "",
@@ -134,6 +139,7 @@ const MainFormPage = () => {
         );
         alert("Form submitted successfully!");
         console.log("Server response:", response.data);
+        console.log("Final Payload:", finalPayload);
       } catch (error) {
         console.error("Error submitting form:", error);
         alert("Failed to submit form. Please try again.");
@@ -146,23 +152,19 @@ const MainFormPage = () => {
     }
   };
 
-
-   return (
+  return (
     <div className="main-form-container">
-      <TabsNavigation 
-        activeTab={activeTab} 
-        onTabChange={handleTabChange} 
-      />
+      <TabsNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="form-content">
         {activeTab === 1 && (
-          <DemographicForm 
+          <DemographicForm
             ref={formRefs[1]}
             onSubmit={handleDemographicSubmit}
             initialValues={formData.demographic}
           />
         )}
         {activeTab === 2 && (
-          <LandForm 
+          <LandForm
             ref={formRefs[2]}
             onSubmit={handleLandSubmit}
             initialValues={formData.land}

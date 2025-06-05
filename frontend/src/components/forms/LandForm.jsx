@@ -43,6 +43,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       landLocation: landLocation,
     });
     console.log(values);
+    console.log(landLocation);
   };
 
   return (

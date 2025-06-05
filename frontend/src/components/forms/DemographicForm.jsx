@@ -57,7 +57,9 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
 
   const handleFinish = (values) => {
     const fullNumber = `+${mobileCode}${values.fr_mobile_number}`;
-
+    console.log(fullNumber);
+    console.log(selectedLocation);
+    console.log(values);
     onSubmit({
       ...values,
       fr_mobile_number: fullNumber,
