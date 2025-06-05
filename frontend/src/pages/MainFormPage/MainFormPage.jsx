@@ -1,36 +1,72 @@
-import React, { useState } from "react";
-import moment from "moment"; // Ensure it's installed via: npm install moment
+import React, { useState, useRef } from "react";
+import moment from "moment";
 import "./MainFormPage.css";
 import axios from "axios";
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
 import TabsNavigation from "../../components/TabsNavigation";
+import { message } from "antd";
 
 const MainFormPage = () => {
   const [activeTab, setActiveTab] = useState(1);
-
   const [formData, setFormData] = useState({
     demographic: {},
     agricultural: {},
     land: {},
   });
 
+  const formRefs = {
+    1: useRef(null),
+    2: useRef(null),
+    3: useRef(null)
+  };
+
+  const validateAndSaveCurrentForm = async () => {
+    const currentFormRef = formRefs[activeTab];
+    if (currentFormRef?.current) {
+      try {
+        await currentFormRef.current.validateFields();
+        const formValues = currentFormRef.current.getFieldsValue();
+        setFormData(prev => ({
+          ...prev,
+          ...(activeTab === 1 && { demographic: formValues }),
+          ...(activeTab === 2 && { land: formValues }),
+          ...(activeTab === 3 && { agricultural: formValues })
+        }));
+        return true;
+      } catch (error) {
+        message.error('Please fill all required fields before proceeding');
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleTabChange = async (newTab) => {
+    const isValid = await validateAndSaveCurrentForm();
+    if (isValid) {
+      setActiveTab(newTab);
+    }
+  };
+
   const handleDemographicSubmit = (data) => {
-    setFormData((prev) => ({ ...prev, demographic: data }));
+    setFormData(prev => ({ ...prev, demographic: data }));
     setActiveTab(2);
   };
 
   const handleLandSubmit = (data) => {
-    setFormData((prev) => ({ ...prev, land: data }));
+    setFormData(prev => ({ ...prev, land: data }));
     setActiveTab(3);
   };
 
   const handleAgriculturalSubmit = (data) => {
-    setFormData((prev) => ({ ...prev, agricultural: data }));
+    setFormData(prev => ({ ...prev, agricultural: data }));
   };
 
-  const handleFinalAction = async (action) => {
+  
+
+    const handleFinalAction = async (action) => {
     if (action === "submit") {
       const { demographic, land, agricultural } = formData;
 
@@ -110,24 +146,31 @@ const MainFormPage = () => {
     }
   };
 
-  return (
-    <div className="main-form-container">
-      <TabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
+   return (
+    <div className="main-form-container">
+      <TabsNavigation 
+        activeTab={activeTab} 
+        onTabChange={handleTabChange} 
+      />
       <div className="form-content">
         {activeTab === 1 && (
-          <DemographicForm
+          <DemographicForm 
+            ref={formRefs[1]}
             onSubmit={handleDemographicSubmit}
             initialValues={formData.demographic}
           />
         )}
-
         {activeTab === 2 && (
-          <LandForm onSubmit={handleLandSubmit} initialValues={formData.land} />
+          <LandForm 
+            ref={formRefs[2]}
+            onSubmit={handleLandSubmit}
+            initialValues={formData.land}
+          />
         )}
-
         {activeTab === 3 && (
           <AgriculturalForm
+            ref={formRefs[3]}
             onSubmit={handleAgriculturalSubmit}
             onFinalAction={handleFinalAction}
             initialValues={formData.agricultural}

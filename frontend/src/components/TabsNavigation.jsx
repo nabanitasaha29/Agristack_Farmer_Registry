@@ -1,25 +1,26 @@
 import React from "react";
+import { Button } from "antd";
 
 const TabsNavigation = ({ activeTab, onTabChange }) => (
   <div className="tabs">
-    <button
-      className={activeTab === 1 ? "active" : ""}
+    <Button
+      type={activeTab === 1 ? "primary" : "default"}
       onClick={() => onTabChange(1)}
     >
       Demographic Details
-    </button>
-    <button
-      className={activeTab === 2 ? "active" : ""}
+    </Button>
+    <Button
+      type={activeTab === 2 ? "primary" : "default"}
       onClick={() => onTabChange(2)}
     >
       Land Details
-    </button>
-    <button
-      className={activeTab === 3 ? "active" : ""}
+    </Button>
+    <Button
+      type={activeTab === 3 ? "primary" : "default"}
       onClick={() => onTabChange(3)}
     >
       Agricultural Details
-    </button>
+    </Button>
   </div>
 );
 
