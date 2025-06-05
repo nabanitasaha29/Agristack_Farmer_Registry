@@ -15,6 +15,11 @@ export const indiaConfig = {
     { value: "DrivingLicense", label: "Driving License" },
     { value: "Passport", label: "Passport" }
   ],
+  landIdentifiers: [
+    { name: "Survey Number", required: true },
+    { name: "Sub-Division Number", required: false },
+    { name: "Plot Number", required: true }
+  ],
   columns: {
     State: "state_name",
     District: "district_name",

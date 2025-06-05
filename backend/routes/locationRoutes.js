@@ -84,4 +84,12 @@ router.get("/id-proof-types", (req, res) => {
   });
 });
 
+
+// Add this new route to get full country config
+router.get("/config", (req, res) => {
+  res.json({ 
+    countryConfigs: countryConfigs 
+  });
+});
+
 export default router;

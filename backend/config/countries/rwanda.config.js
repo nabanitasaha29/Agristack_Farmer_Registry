@@ -16,6 +16,13 @@ export const rwandaConfig = {
   { value: "VoterCard", label: "Voter's Card" }
 ],
 
+  landIdentifiers: [
+  { name: "UPI (Unique Parcel Identifier)", required: true },
+  { name: "Land Title Number", required: true },
+  { name: "Plot Number", required: false }
+],
+
+
   columns: {
     Province: "province_name",
     District: "district_name",

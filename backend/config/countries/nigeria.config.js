@@ -14,6 +14,13 @@ export const nigeriaConfig = {
     { value: "DriversLicense", label: "Driver's License" },
     { value: "Passport", label: "International Passport" }
   ],
+  
+    landIdentifiers: [
+  { name: "Survey Plan Number", required: true },
+  { name: "Plot Number", required: true },
+  { name: "Block Number", required: false }
+],
+
   columns: {
     State: "state_name",
     "Local Government": "local_govt_name",

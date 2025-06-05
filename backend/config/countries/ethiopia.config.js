@@ -16,6 +16,13 @@ export const ethiopiaConfig = {
   { value: "VoterCard", label: "Voter's Card" }
 ],
 
+  landIdentifiers: [
+  { name: "Parcel Number", required: true },
+  { name: "Holding Number", required: false },
+  { name: "Kebele Registration ID", required: true }
+],
+
+
   columns: {
     Region: "region_name",
     Zone: "zone_name",
