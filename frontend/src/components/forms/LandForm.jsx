@@ -54,7 +54,7 @@
 //       initialValues={initialValues}
 //     >
 //       <h2>Land Details</h2>
-      
+
 //       <LocationSelector
 //         form={form}
 //         fieldNamePrefix="landLocationLevels"
@@ -148,12 +148,12 @@ const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
           "http://localhost:5000/api/location/active-country"
         );
         const countryCode = countryRes.data.countryCode || "IN";
-        
+
         const configRes = await axios.get(
           "http://localhost:5000/api/location/config"
         );
         const countryConfig = configRes.data.countryConfigs[countryCode];
-        
+
         if (countryConfig && countryConfig.landIdentifiers) {
           setLandIdentifiers(countryConfig.landIdentifiers);
         }
@@ -186,7 +186,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       initialValues={initialValues}
     >
       <h2>Land Details</h2>
-      
+
       <LocationSelector
         form={form}
         fieldNamePrefix="landLocationLevels"
@@ -200,7 +200,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
               name={`fr_land_identifier_${index + 1}`}
               label={identifier.name}
               rules={[
-                { 
+                {
                   required: identifier.required,
                   message: `Please enter ${identifier.name}`
                 }
@@ -217,7 +217,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
           <Form.Item
             name="fr_land_area"
             label="Land Area"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter Land Area" }]}
           >
             <InputNumber style={{ width: "100%" }} addonAfter={areaUnit} />
           </Form.Item>

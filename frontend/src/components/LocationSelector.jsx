@@ -43,6 +43,32 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
 
     fetchHierarchy();
   }, []);
+  useEffect(() => {
+    if (!levels.length) return;
+
+    const restored = {};
+    levels.forEach(({ level_order, level_name }) => {
+      const val = form.getFieldValue([fieldNamePrefix, "locationLevels", `level_${level_order}`]);
+      if (val) {
+        restored[level_name] = val;
+      }
+    });
+
+    setSelectedValues(restored);
+
+    // Fetch options for levels where parent value exists
+    levels.forEach(({ level_order, level_name }) => {
+      const parent = levels.find((lvl) => lvl.level_order === level_order - 1);
+      const parentValue = parent ? restored[parent.level_name] : null;
+
+      if (restored[level_name]) {
+        fetchOptionsForLevel(level_name, parentValue);
+      }
+    });
+
+    onSelectionChange?.(restored);
+  }, [form, levels]);
+
 
   const fetchOptionsForLevel = async (levelName, parentValue = null) => {
     try {
@@ -135,7 +161,8 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
             <Form.Item
               name={[fieldNamePrefix, "locationLevels", `level_${level_order}`]}
               label={level_name}
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: `Please select ${level_name}` }]}
+
             >
               <Select
                 placeholder={`Select a ${level_name}`}

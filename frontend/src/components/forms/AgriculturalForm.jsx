@@ -35,7 +35,7 @@ const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues },
       <Form.Item
         name="fr_farmer_type"
         label="Farmer Type"
-        rules={[{ required: true }]}
+        rules={[{ required: true, message: "Please select Farmer Type" }]}
       >
         <Select>
           <Option value="Landowner">Landowner</Option>
@@ -47,7 +47,7 @@ const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues },
       <Form.Item
         name="fr_farmer_category"
         label="Farmer Category"
-        rules={[{ required: true }]}
+        rules={[{ required: true, message: "Please select Farmer Category" }]}
       >
         <Select>
           <Option value="Small">Small</Option>
@@ -59,7 +59,7 @@ const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues },
       <Form.Item
         name="fr_total_land_area_owned"
         label="Total Land Area Owned"
-        rules={[{ required: true }]}
+        rules={[{ required: true, message: "Please input Total Land Area Owned" }]}
       >
         <InputNumber style={{ width: "100%" }} />
       </Form.Item>
@@ -67,7 +67,7 @@ const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues },
       <Form.Item
         name="fr_no_of_lands_owned"
         label="Number of Lands Owned"
-        rules={[{ required: true }]}
+        rules={[{ required: true, message: "Please input Number of Lands Owned" }]}
       >
         <InputNumber style={{ width: "100%" }} />
       </Form.Item>
