@@ -14,12 +14,19 @@ export const nigeriaConfig = {
     { value: "DriversLicense", label: "Driver's License" },
     { value: "Passport", label: "International Passport" }
   ],
-  
-    landIdentifiers: [
-  { name: "Survey Plan Number", required: true },
-  { name: "Plot Number", required: true },
-  { name: "Block Number", required: false }
-],
+  socialCategories: [
+    { value: "GEN", label: "General" },
+    { value: "DISADVANTAGED", label: "Disadvantaged Group" },
+    { value: "WIDOWS", label: "Widows" },
+    { value: "PWD", label: "Persons with Disabilities" },
+    { value: "YOUTH", label: "Youth" },
+    { value: "ELDERLY", label: "Elderly" }
+  ],
+  landIdentifiers: [
+    { name: "Survey Plan Number", required: true },
+    { name: "Plot Number", required: true },
+    { name: "Block Number", required: false }
+  ],
 
   columns: {
     State: "state_name",

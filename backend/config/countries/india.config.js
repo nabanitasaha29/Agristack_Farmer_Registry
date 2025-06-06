@@ -15,6 +15,13 @@ export const indiaConfig = {
     { value: "DrivingLicense", label: "Driving License" },
     { value: "Passport", label: "Passport" }
   ],
+  socialCategories: [
+    { value: "GEN", label: "General" },
+    { value: "OBC", label: "Other Backward Class" },
+    { value: "SC", label: "Scheduled Caste" },
+    { value: "ST", label: "Scheduled Tribe" },
+    { value: "OTHER", label: "Other" }
+  ],
   landIdentifiers: [
     { name: "Survey Number", required: true },
     { name: "Sub-Division Number", required: false },

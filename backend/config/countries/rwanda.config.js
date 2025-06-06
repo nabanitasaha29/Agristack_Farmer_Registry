@@ -10,17 +10,22 @@ export const rwandaConfig = {
   mobileCode: "250",
   tableName: "rwanda_location_data",
   idProofTypes: [
-  { value: "NID", label: "National Identification Card" },
-  { value: "Passport", label: "Passport" },
-  { value: "DrivingLicense", label: "Driving License" },
-  { value: "VoterCard", label: "Voter's Card" }
-],
-
+    { value: "NID", label: "National Identification Card" },
+    { value: "Passport", label: "Passport" },
+    { value: "DrivingLicense", label: "Driving License" },
+    { value: "VoterCard", label: "Voter's Card" }
+  ],
+  socialCategories: [
+    { value: "CATEGORY_1", label: "Ubudehe Category 1 (Very Poor)" },
+    { value: "CATEGORY_2", label: "Ubudehe Category 2 (Poor)" },
+    { value: "CATEGORY_3", label: "Ubudehe Category 3 (Middle Income)" },
+    { value: "CATEGORY_4", label: "Ubudehe Category 4 (Relatively Wealthy)" }
+  ],
   landIdentifiers: [
-  { name: "UPI (Unique Parcel Identifier)", required: true },
-  { name: "Land Title Number", required: true },
-  { name: "Plot Number", required: false }
-],
+    { name: "UPI (Unique Parcel Identifier)", required: true },
+    { name: "Land Title Number", required: true },
+    { name: "Plot Number", required: false }
+  ],
 
 
   columns: {

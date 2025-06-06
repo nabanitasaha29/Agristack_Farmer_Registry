@@ -10,19 +10,23 @@ export const ethiopiaConfig = {
   mobileCode: "251",
   tableName: "ethiopia_location_data",
   idProofTypes: [
-  { value: "KebeleID", label: "Kebele ID Card" },
-  { value: "Passport", label: "Passport" },
-  { value: "DrivingLicense", label: "Driving License" },
-  { value: "VoterCard", label: "Voter's Card" }
-],
-
+    { value: "KebeleID", label: "Kebele ID Card" },
+    { value: "Passport", label: "Passport" },
+    { value: "DrivingLicense", label: "Driving License" },
+    { value: "VoterCard", label: "Voter's Card" }
+  ],
+  socialCategories: [
+    { value: "GEN", label: "General" },
+    { value: "PASTORALIST", label: "Pastoralist Community" },
+    { value: "AGRICULTURALIST", label: "Agriculturalist Community" },
+    { value: "WOMEN_HEAD", label: "Women-Headed Household" },
+    { value: "PWD", label: "Persons with Disabilities" }
+  ],
   landIdentifiers: [
-  { name: "Parcel Number", required: true },
-  { name: "Holding Number", required: false },
-  { name: "Kebele Registration ID", required: true }
-],
-
-
+    { name: "Parcel Number", required: true },
+    { name: "Holding Number", required: false },
+    { name: "Kebele Registration ID", required: true }
+  ],
   columns: {
     Region: "region_name",
     Zone: "zone_name",

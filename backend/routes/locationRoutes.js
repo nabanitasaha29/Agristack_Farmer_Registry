@@ -78,18 +78,36 @@ router.get("/id-proof-types", (req, res) => {
       .json({ error: "ID proof types not found for active country" });
   }
 
-  res.json({ 
+  res.json({
     countryCode: activeCountry,
-    idProofTypes: config.idProofTypes 
+    idProofTypes: config.idProofTypes
   });
 });
 
 
 // Add this new route to get full country config
 router.get("/config", (req, res) => {
-  res.json({ 
-    countryConfigs: countryConfigs 
+  res.json({
+    countryConfigs: countryConfigs
   });
 });
+
+// New route: Social categories
+router.get("/social-categories", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.socialCategories) {
+    return res
+      .status(404)
+      .json({ error: "Social categories not found for active country" });
+  }
+
+  res.json({
+    countryCode: activeCountry,
+    socialCategories: config.socialCategories,
+  });
+});
+
 
 export default router;
