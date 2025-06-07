@@ -25,3 +25,32 @@ body {
 .next-restart:hover {
   background-color: rgb(255, 0, 0) !important;
 }
+
+/* Selected Tab (Solid Variant) */
+.ant-btn.ant-btn-variant-solid {
+  background-color: #28a745 !important; /* Green */
+  border-color: #1e7e34 !important;
+  color: white !important;
+}
+
+.ant-btn.ant-btn-variant-solid:hover {
+  background-color: #218838 !important;
+  border-color: #1c7430 !important;
+}
+
+/* Unselected Tab (Outlined Variant) */
+:where(.css-dev-only-do-not-override-mc1tut).ant-btn-variant-outlined:not(
+    :disabled
+  ):not(.ant-btn-disabled) {
+  border-color: #28a745 !important;
+  color: #28a745 !important;
+  background-color: white !important;
+}
+
+:where(.css-dev-only-do-not-override-mc1tut).ant-btn-variant-outlined:not(
+    :disabled
+  ):not(.ant-btn-disabled):hover {
+  background-color: #e6f4ea !important; /* Light green tint on hover */
+  border-color: #218838 !important;
+  color: #1e7e34 !important;
+}

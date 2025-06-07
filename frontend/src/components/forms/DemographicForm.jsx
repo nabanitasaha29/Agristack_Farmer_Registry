@@ -10,13 +10,10 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   const [form] = Form.useForm();
   const [countryCode, setCountryCode] = useState(null);
   const [mobileCode, setMobileCode] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(initialValues.selectedLocation || {});
-  const [idProofTypes, setIdProofTypes] = useState([
-    { value: "Aadhaar", label: "Aadhaar" },
-    { value: "Voter ID", label: "Voter ID" },
-    { value: "Passport", label: "Passport" },
-    { value: "Driving License", label: "Driving License" }
-  ]);
+  const [selectedLocation, setSelectedLocation] = useState(
+    initialValues.selectedLocation || {}
+  );
+  const [idProofTypes, setIdProofTypes] = useState([]);
   const [socialCategories, setSocialCategories] = useState([]);
 
   // Properly expose form methods via ref
@@ -74,7 +71,6 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       if (socialCategoryData.socialCategories) {
         setSocialCategories(socialCategoryData.socialCategories);
       }
-
     };
 
     fetchCountryAndMobileCode();
@@ -106,19 +102,18 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
           <Form.Item
             name="fr_full_name"
             label="Full Name"
-            rules={[{
-              required: true,
-              message: 'Please input your Full Name!'
-            }]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your Full Name!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item
-            name="fr_local_language_name"
-            label="Local Language Name"
-          >
+          <Form.Item name="fr_local_language_name" label="Local Language Name">
             <Input />
           </Form.Item>
         </Col>
@@ -127,24 +122,26 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
-            name="fr_dob"
+             name="fr_dob"
             label="Date of Birth"
             rules={[
+              
               // {
               //   required: true,
               //   message: 'Please select your date of birth'
               // },
               {
                 validator: (_, value) => {
+                  
                   if (!value) {
-                    return Promise.reject('Please select your Date of Birth');
+                    return Promise.reject("Please select your Date of Birth");
                   }
                   const today = dayjs();
-                  const age = today.diff(value, 'year');
+                  const age = today.diff(value, "year");
                   if (age >= 18) {
                     return Promise.resolve();
                   }
-                  return Promise.reject('You must be at least 18 years old');
+                  return Promise.reject("You must be at least 18 years old");
                 },
               },
             ]}
@@ -156,10 +153,12 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
           <Form.Item
             name="fr_gender"
             label="Gender"
-            rules={[{
-              required: true,
-              message: 'Please select your Gender'
-            }]}
+            rules={[
+              {
+                required: true,
+                message: "Please select your Gender",
+              },
+            ]}
           >
             <Select>
               <Option value="Male">Male</Option>
@@ -173,7 +172,9 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       <Form.Item
         name="fr_social_category"
         label="Social Category"
-        rules={[{ required: true, message: "Please select your Social Category" }]}
+        rules={[
+          { required: true, message: "Please select your Social Category" },
+        ]}
       >
         <Select placeholder="Select social category">
           {socialCategories.map((cat) => (
@@ -191,9 +192,9 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
             label="Email"
             rules={[
               {
-                type: 'email',
-                message: 'Please enter a valid Email Address'
-              }
+                type: "email",
+                message: "Please enter a valid Email Address",
+              },
             ]}
           >
             <Input />
@@ -212,10 +213,10 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
                 validator: (_, value) => {
                   const trimmedValue = value?.toString().trim();
                   if (!trimmedValue) {
-                    return Promise.reject('Please enter Mobile Number');
+                    return Promise.reject("Please enter Mobile Number");
                   }
                   if (!mobileCode || !countryCode) {
-                    return Promise.reject('Country code not loaded yet');
+                    return Promise.reject("Country code not loaded yet");
                   }
                   const fullNumber = `+${mobileCode}${trimmedValue}`;
 
@@ -241,10 +242,12 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       <Form.Item
         name="fr_id_proof_type"
         label="ID Proof Type"
-        rules={[{
-          required: true,
-          message: 'Please select ID Proof Type'
-        }]}
+        rules={[
+          {
+            required: true,
+            message: "Please select ID Proof Type",
+          },
+        ]}
       >
         <Select placeholder="Select ID Proof Type">
           {idProofTypes.map((proofType) => (
@@ -258,10 +261,12 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       <Form.Item
         name="fr_id_proof_number"
         label="ID Proof Number"
-        rules={[{
-          required: true,
-          message: 'Please input your ID Proof Number'
-        }]}
+        rules={[
+          {
+            required: true,
+            message: "Please input your ID Proof Number",
+          },
+        ]}
       >
         <Input />
       </Form.Item>
@@ -269,18 +274,17 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       <Form.Item
         name="fr_address_line_1"
         label="Address Line 1"
-        rules={[{
-          required: true,
-          message: 'Please input your Address'
-        }]}
+        rules={[
+          {
+            required: true,
+            message: "Please input your Address",
+          },
+        ]}
       >
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="fr_address_line_2"
-        label="Address Line 2"
-      >
+      <Form.Item name="fr_address_line_2" label="Address Line 2">
         <Input />
       </Form.Item>
 
@@ -296,10 +300,12 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
           <Form.Item
             name="fr_postal_code"
             label="Postal Code"
-            rules={[{
-              required: true,
-              message: 'Please input your Postal Code'
-            }]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your Postal Code",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -312,11 +318,7 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
         onSelectionChange={setSelectedLocation}
       />
 
-      <Button
-        className="next-button"
-        type="primary"
-        htmlType="submit"
-      >
+      <Button className="next-button" type="primary" htmlType="submit">
         Next
       </Button>
     </Form>
