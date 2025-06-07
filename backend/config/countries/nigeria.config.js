@@ -28,6 +28,12 @@ export const nigeriaConfig = {
     { name: "Plot Number", required: true },
     { name: "Block Number", required: false },
   ],
+  postalCodeConfig: {
+    label: "Postal Code",
+    length: 6,
+    regex: "^[0-9]{6}$", // Nigeria's NIPOST codes
+    required: true,
+  },
 
   // columns: {
   //   State: "state_name",

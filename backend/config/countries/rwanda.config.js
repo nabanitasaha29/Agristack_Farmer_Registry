@@ -27,6 +27,12 @@ export const rwandaConfig = {
     { name: "Land Title Number", required: true },
     { name: "Plot Number", required: false },
   ],
+  postalCodeConfig: {
+    label: "Postal Code",
+    length: 3,
+    regex: "^[0-9]{3}$", // Rwanda uses 3-digit postal codes
+    required: false,
+  },
 
   // columns: {
   //   Province: "province_name",

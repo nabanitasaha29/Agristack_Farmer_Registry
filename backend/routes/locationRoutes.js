@@ -110,4 +110,28 @@ router.get("/social-categories", (req, res) => {
 });
 
 
+
+
+
+
+
+// New route for postal code config
+router.get("/postal-code-config", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.postalCodeConfig) {
+    return res
+      .status(404)
+      .json({ error: "Postal code config not found for active country" });
+  }
+
+  res.json({
+    countryCode: activeCountry,
+    postalCodeConfig: config.postalCodeConfig,
+  });
+});
+
+
+
 export default router;

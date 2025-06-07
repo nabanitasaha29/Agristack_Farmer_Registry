@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useState } from "react";
 import { Form, Input, DatePicker, Select, Button, Row, Col } from "antd";
+import axios from "axios";
 import dayjs from "dayjs";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import LocationSelector from "../LocationSelector";
@@ -9,6 +10,8 @@ const { Option } = Select;
 const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   const [form] = Form.useForm();
   const [countryCode, setCountryCode] = useState(null);
+  const [postalCodeConfig, setPostalCodeConfig] = useState(null);
+  const { label, required, regex, length } = postalCodeConfig || {};
   const [mobileCode, setMobileCode] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(
     initialValues.selectedLocation || {}
@@ -29,6 +32,14 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
     },
   }));
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/location/postal-code-config")
+      .then((res) => {
+        console.log("Postal Config Loaded:", res.data);
+        setPostalCodeConfig(res.data.postalCodeConfig);
+      });
+  }, []);
   useEffect(() => {
     form.setFieldsValue(initialValues);
   }, [initialValues, form]);
@@ -122,17 +133,15 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
-             name="fr_dob"
+            name="fr_dob"
             label="Date of Birth"
             rules={[
-              
               // {
               //   required: true,
               //   message: 'Please select your date of birth'
               // },
               {
                 validator: (_, value) => {
-                  
                   if (!value) {
                     return Promise.reject("Please select your Date of Birth");
                   }
@@ -297,18 +306,24 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
 
       <Row gutter={16}>
         <Col span={8}>
-          <Form.Item
-            name="fr_postal_code"
-            label="Postal Code"
-            rules={[
-              {
-                required: true,
-                message: "Please input your Postal Code",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+          {postalCodeConfig && (
+            <Form.Item
+              label={label}
+              name="fr_postal_code"
+              rules={[
+                {
+                  required,
+                  message: `${label} is required`,
+                },
+                {
+                  pattern: new RegExp(regex),
+                  message: `Enter a valid ${label}`,
+                },
+              ]}
+            >
+              <Input maxLength={length} />
+            </Form.Item>
+          )}
         </Col>
       </Row>
 

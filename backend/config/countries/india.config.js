@@ -28,6 +28,12 @@ export const indiaConfig = {
     { name: "Sub-Division Number", required: false },
     { name: "Plot Number", required: true },
   ],
+  postalCodeConfig: {
+    label: "PIN Code",
+    length: 6,
+    regex: "^[1-9][0-9]{5}$", // e.g., 560001
+    required: true,
+  },
   // columns: {
   //   State: "state_name",
   //   District: "district_name",

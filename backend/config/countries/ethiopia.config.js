@@ -28,6 +28,12 @@ export const ethiopiaConfig = {
     { name: "Holding Number", required: false },
     { name: "Kebele Registration ID", required: true },
   ],
+  postalCodeConfig: {
+    label: "Postal Code",
+    length: 4,
+    regex: "^[0-9]{4}$", // Ethiopia uses 4-digit codes
+    required: false,
+  },
   // columns: {
   //   Region: "region_name",
   //   Zone: "zone_name",
