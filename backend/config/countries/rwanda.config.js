@@ -8,37 +8,51 @@ export const rwandaHierarchy = [
 export const rwandaConfig = {
   areaUnit: "acres",
   mobileCode: "250",
-  tableName: "rwanda_location_data",
+  // tableName: "rwanda_location_data",
+  tableName: "country_agnostik_location_master",
   idProofTypes: [
     { value: "NID", label: "National Identification Card" },
     { value: "Passport", label: "Passport" },
     { value: "DrivingLicense", label: "Driving License" },
-    { value: "VoterCard", label: "Voter's Card" }
+    { value: "VoterCard", label: "Voter's Card" },
   ],
   socialCategories: [
     { value: "CATEGORY_1", label: "Ubudehe Category 1 (Very Poor)" },
     { value: "CATEGORY_2", label: "Ubudehe Category 2 (Poor)" },
     { value: "CATEGORY_3", label: "Ubudehe Category 3 (Middle Income)" },
-    { value: "CATEGORY_4", label: "Ubudehe Category 4 (Relatively Wealthy)" }
+    { value: "CATEGORY_4", label: "Ubudehe Category 4 (Relatively Wealthy)" },
   ],
   landIdentifiers: [
     { name: "UPI (Unique Parcel Identifier)", required: true },
     { name: "Land Title Number", required: true },
-    { name: "Plot Number", required: false }
+    { name: "Plot Number", required: false },
   ],
 
+  // columns: {
+  //   Province: "province_name",
+  //   District: "district_name",
+  //   Sector: "sector_name",
+  //   Cell: "cell_name",
+  //   Village: "village_name",
+  // },
+  // parentColumns: {
+  //   District: "province_name",
+  //   Sector: "district_name",
+  //   Cell: "sector_name",
+  //   Village: "cell_name",
+  // },
 
   columns: {
-    Province: "province_name",
-    District: "district_name",
-    Sector: "sector_name",
-    Cell: "cell_name",
-    Village: "village_name",
+    Province: "level_1_name",
+    District: "level_2_name",
+    Sector: "level_3_name",
+    Cell: "level_4_name",
+    Village: "level_5_name",
   },
   parentColumns: {
-    District: "province_name",
-    Sector: "district_name",
-    Cell: "sector_name",
-    Village: "cell_name",
+    District: "level_1_name",
+    Sector: "level_2_name",
+    Cell: "level_3_name",
+    Village: "level_4_name",
   },
 };

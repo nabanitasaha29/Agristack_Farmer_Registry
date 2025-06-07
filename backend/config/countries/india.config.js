@@ -7,7 +7,8 @@ export const indiaHierarchy = [
 export const indiaConfig = {
   areaUnit: "hectares",
   mobileCode: "91",
-  tableName: "lgd_master",
+  // tableName: "lgd_master",
+  tableName: "country_agnostik_location_master",
   idProofTypes: [
     { value: "Aadhaar", label: "Aadhaar Card" },
     { value: "PAN", label: "PAN Card" },
@@ -27,15 +28,27 @@ export const indiaConfig = {
     { name: "Sub-Division Number", required: false },
     { name: "Plot Number", required: true },
   ],
+  // columns: {
+  //   State: "state_name",
+  //   District: "district_name",
+  //   Subdistrict: "sub_district_name",
+  //   Village: "village_name",
+  // },
+  // parentColumns: {
+  //   District: "state_name",
+  //   Subdistrict: "district_name",
+  //   Village: "sub_district_name",
+  // },
+
   columns: {
-    State: "state_name",
-    District: "district_name",
-    Subdistrict: "sub_district_name",
-    Village: "village_name",
+    State: "level_1_name",
+    District: "level_2_name",
+    Subdistrict: "level_3_name",
+    Village: "level_4_name",
   },
   parentColumns: {
-    District: "state_name",
-    Subdistrict: "district_name",
-    Village: "sub_district_name",
+    District: "level_1_name",
+    Subdistrict: "level_2_name",
+    Village: "level_3_name",
   },
 };

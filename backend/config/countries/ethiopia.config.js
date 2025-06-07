@@ -8,34 +8,47 @@ export const ethiopiaHierarchy = [
 export const ethiopiaConfig = {
   areaUnit: "hectares",
   mobileCode: "251",
-  tableName: "ethiopia_location_data",
+  // tableName: "ethiopia_location_data",
+  tableName: "country_agnostik_location_master",
   idProofTypes: [
     { value: "KebeleID", label: "Kebele ID Card" },
     { value: "Passport", label: "Passport" },
     { value: "DrivingLicense", label: "Driving License" },
-    { value: "VoterCard", label: "Voter's Card" }
+    { value: "VoterCard", label: "Voter's Card" },
   ],
   socialCategories: [
     { value: "GEN", label: "General" },
     { value: "PASTORALIST", label: "Pastoralist Community" },
     { value: "AGRICULTURALIST", label: "Agriculturalist Community" },
     { value: "WOMEN_HEAD", label: "Women-Headed Household" },
-    { value: "PWD", label: "Persons with Disabilities" }
+    { value: "PWD", label: "Persons with Disabilities" },
   ],
   landIdentifiers: [
     { name: "Parcel Number", required: true },
     { name: "Holding Number", required: false },
-    { name: "Kebele Registration ID", required: true }
+    { name: "Kebele Registration ID", required: true },
   ],
+  // columns: {
+  //   Region: "region_name",
+  //   Zone: "zone_name",
+  //   Woreda: "woreda_name",
+  //   Kebele: "kebele_name",
+  // },
+  // parentColumns: {
+  //   Zone: "region_name",
+  //   Woreda: "zone_name",
+  //   Kebele: "woreda_name",
+  // },
+
   columns: {
-    Region: "region_name",
-    Zone: "zone_name",
-    Woreda: "woreda_name",
-    Kebele: "kebele_name",
+    Region: "level_1_name",
+    Zone: "level_2_name",
+    Woreda: "level_3_name",
+    Kebele: "level_4_name",
   },
   parentColumns: {
-    Zone: "region_name",
-    Woreda: "zone_name",
-    Kebele: "woreda_name",
+    Zone: "level_1_name",
+    Woreda: "level_2_name",
+    Kebele: "level_3_name",
   },
 };
