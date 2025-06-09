@@ -1,13 +1,14 @@
-// testing
 import React, { useState, useRef } from "react";
 import moment from "moment";
-import "./MainFormPage.css";
 import axios from "axios";
+import { message } from "antd";
+
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
 import TabsNavigation from "../../components/TabsNavigation";
-import { message } from "antd";
+
+import "./MainFormPage.css";
 
 const MainFormPage = () => {
   const [activeTab, setActiveTab] = useState(1);
@@ -17,55 +18,43 @@ const MainFormPage = () => {
     land: { entries: [] },
   });
 
-  // Refs for each form to trigger validation
   const formRefs = {
     1: useRef(null),
     2: useRef(null),
     3: useRef(null),
   };
 
-  // Validate and store current form data
   const validateAndSaveCurrentForm = async () => {
     const currentFormRef = formRefs[activeTab];
-    if (currentFormRef?.current) {
-      try {
-        await currentFormRef.current.validateFields();
-        const formValues = currentFormRef.current.getFieldsValue();
-        //new
-        if (activeTab === 1 && formValues.fr_mobile_number) {
-          const prevMobile = formData.demographic.fr_mobile_number || "";
-          if (prevMobile.startsWith("+")) {
-            formValues.fr_mobile_number = prevMobile; // Keep it formatted
-          }
-        }
-        if (activeTab === 2 && formValues.lands) {
-          formValues.entries = formValues.lands;
-        }
+    if (!currentFormRef?.current) return true;
 
-        // Update formData with new values
-        setFormData((prev) => ({
-          ...prev,
-          ...(activeTab === 1 && { demographic: formValues }),
-          ...(activeTab === 2 && { land: formValues }),
-          ...(activeTab === 3 && { agricultural: formValues }),
-        }));
+    try {
+      await currentFormRef.current.validateFields();
+      const formValues = currentFormRef.current.getFieldsValue();
 
-        return true;
-      } catch (error) {
-        message.error("Please fill all required fields before proceeding");
-        return false;
+      if (activeTab === 2 && formValues.lands) {
+        formValues.entries = formValues.lands;
       }
+
+      setFormData((prev) => ({
+        ...prev,
+        ...(activeTab === 1 && { demographic: formValues }),
+        ...(activeTab === 2 && { land: formValues }),
+        ...(activeTab === 3 && { agricultural: formValues }),
+      }));
+
+      return true;
+    } catch (error) {
+      message.error("Please fill all required fields before proceeding.");
+      return false;
     }
-    return true;
   };
 
-  // Tab change with validation check
   const handleTabChange = async (newTab) => {
     const isValid = await validateAndSaveCurrentForm();
     if (isValid) setActiveTab(newTab);
   };
 
-  // Individual form submit handlers
   const handleDemographicSubmit = (data) => {
     setFormData((prev) => ({ ...prev, demographic: data }));
     setActiveTab(2);
@@ -76,7 +65,7 @@ const MainFormPage = () => {
       ...prev,
       land: {
         ...data,
-        entries: data.lands || prev.land?.entries || [],
+        entries: data.lands || prev.land.entries || [],
       },
     }));
     setActiveTab(3);
@@ -86,21 +75,21 @@ const MainFormPage = () => {
     setFormData((prev) => ({ ...prev, agricultural: data }));
   };
 
-  // Calculate farmer stats based on land data
   const calculateAgriculturalData = (landEntries) => {
     if (!landEntries || landEntries.length === 0) {
       return {
         fr_no_of_lands_owned: 0,
-        fr_total_land_area_owned: 0,
+        fr_total_land_area_owned: "0.00",
         fr_farmer_category: "Small",
       };
     }
 
-    const totalArea = landEntries.reduce((sum, land) => {
-      return sum + (parseFloat(land.fr_land_area) || 0);
-    }, 0);
-
+    const totalArea = landEntries.reduce(
+      (sum, land) => sum + (parseFloat(land.fr_land_area) || 0),
+      0
+    );
     const landCount = landEntries.length;
+
     let farmerCategory = "Small";
     if (totalArea > 10) farmerCategory = "Large";
     else if (totalArea > 5) farmerCategory = "Medium";
@@ -112,11 +101,9 @@ const MainFormPage = () => {
     };
   };
 
-  // Final submit/draft/restart handler
   const handleFinalAction = async (action) => {
     if (action === "submit") {
       const { demographic, land, agricultural } = formData;
-
       const locationLevels = demographic.locationLevels || {};
       const landEntries = land.entries || [];
 
@@ -131,19 +118,20 @@ const MainFormPage = () => {
         fr_email: demographic.fr_email || "",
         fr_id_proof_type: demographic.fr_id_proof_type || "",
         fr_id_proof_number: demographic.fr_id_proof_number || "",
-        fr_mobile_number:
-          demographic.fr_mobile_number?.replace(/\D/g, "") || "",
+        fr_mobile_number: demographic.fr_mobile_number
+          ? demographic.fr_mobile_number.replace(/\D/g, "")
+          : "",
         fr_address_line_1: demographic.fr_address_line_1 || "",
         fr_address_line_2: demographic.fr_address_line_2 || "",
         fr_local_language_address: demographic.fr_local_language_address || "",
         fr_postal_code: demographic.fr_postal_code || "",
-        fr_level_1_id: locationLevels.level_1 || "",
-        fr_level_2_id: locationLevels.level_2 || "",
-        fr_level_3_id: locationLevels.level_3 || "",
-        fr_level_4_id: locationLevels.level_4 || "",
-        fr_level_5_id: locationLevels.level_5 || "",
-        fr_level_6_id: locationLevels.level_6 || "",
       };
+
+      // Dynamically map locationLevels to fr_level_X_id
+      const levelKeys = Object.keys(locationLevels);
+      levelKeys.forEach((key, index) => {
+        demographicPayload[`fr_level_${index + 1}_id`] = locationLevels[key];
+      });
 
       const finalPayload = {
         demographic: demographicPayload,
@@ -151,7 +139,7 @@ const MainFormPage = () => {
           fr_farmer_type: agricultural.fr_farmer_type || "",
           fr_farmer_category: agricultural.fr_farmer_category || "",
           fr_total_land_area_owned: agricultural.fr_total_land_area_owned || "",
-          fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || "",
+          fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || 0,
         },
         land: {
           entries: landEntries.map((entry) => ({
@@ -171,10 +159,8 @@ const MainFormPage = () => {
       };
 
       try {
-        console.log(
-          "Final Payload to be submitted:",
-          JSON.stringify(finalPayload, null, 2)
-        );
+        console.log("Final Payload:", finalPayload);
+        console.log("📤 Sending demographic.locationLevels:", locationLevels);
         const response = await axios.post(
           "http://localhost:5000/api/farmer/register",
           finalPayload
@@ -182,7 +168,7 @@ const MainFormPage = () => {
         alert("Form submitted successfully!");
         console.log("Server response:", response.data);
       } catch (error) {
-        console.error("Error submitting form:", error);
+        console.error("Submit error:", error);
         alert("Failed to submit form. Please try again.");
       }
     } else if (action === "draft") {
@@ -210,7 +196,7 @@ const MainFormPage = () => {
             onSubmit={handleLandSubmit}
             initialValues={{
               ...formData.land,
-              lands: formData.land?.entries,
+              lands: formData.land.entries,
             }}
           />
         )}
@@ -221,9 +207,13 @@ const MainFormPage = () => {
             onFinalAction={handleFinalAction}
             initialValues={{
               ...formData.agricultural,
-              ...calculateAgriculturalData(formData.land?.entries || []),
+              ...calculateAgriculturalData(formData.land.entries || []),
             }}
-            landUnit={formData.land?.entries?.[0]?.fr_area_unit || "acres"}
+            landUnit={
+              formData.land.entries?.[0]?.fr_area_unit
+                ? formData.land.entries[0].fr_area_unit
+                : "acres"
+            }
           />
         )}
       </div>

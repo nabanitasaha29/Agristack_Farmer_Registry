@@ -6,36 +6,30 @@ const { Option } = Select;
 
 const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
   const [levels, setLevels] = useState([]);
-  const [countryCode, setCountryCode] = useState(null);
   const [locationOptions, setLocationOptions] = useState({});
   const [selectedValues, setSelectedValues] = useState({});
-  const [isHierarchyLoading, setIsHierarchyLoading] = useState(true); // global spinner
+  const [isHierarchyLoading, setIsHierarchyLoading] = useState(true);
   const [loadingLevel, setLoadingLevel] = useState(null);
 
+  // Fetch hierarchy on mount
   useEffect(() => {
     const fetchHierarchy = async () => {
+      setIsHierarchyLoading(true);
       try {
-        setIsHierarchyLoading(true);
         const response = await axios.get(
           "http://localhost:5000/api/location/hierarchy"
         );
-
-        if (response.data) {
-          const { countryCode, hierarchy } = response.data;
-          setCountryCode(countryCode);
-
-          if (hierarchy) {
-            const sortedLevels = hierarchy.sort(
-              (a, b) => a.level_order - b.level_order
-            );
-            setLevels(sortedLevels);
-            if (sortedLevels.length > 0) {
-              fetchOptionsForLevel(sortedLevels[0].level_name); // top-level options
-            }
+        if (response.data?.hierarchy) {
+          const sortedLevels = response.data.hierarchy.sort(
+            (a, b) => a.level_order - b.level_order
+          );
+          setLevels(sortedLevels);
+          if (sortedLevels.length > 0) {
+            fetchOptionsForLevel(sortedLevels[0].level_name); // fetch top level options
           }
         }
-      } catch (error) {
-        console.error("Error fetching location hierarchy:", error);
+      } catch (err) {
+        console.error("Error fetching location hierarchy:", err);
       } finally {
         setIsHierarchyLoading(false);
       }
@@ -43,36 +37,40 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
 
     fetchHierarchy();
   }, []);
+
+  // Restore saved values from form and fetch options for dependent levels
   useEffect(() => {
     if (!levels.length) return;
 
     const restored = {};
     levels.forEach(({ level_order, level_name }) => {
-      const val = form.getFieldValue([fieldNamePrefix, "locationLevels", `level_${level_order}`]);
-      if (val) {
-        restored[level_name] = val;
-      }
+      const val = form.getFieldValue([
+        fieldNamePrefix,
+        "locationLevels",
+        `level_${level_order}`,
+      ]);
+      if (val) restored[level_name] = val;
     });
 
     setSelectedValues(restored);
 
-    // Fetch options for levels where parent value exists
+    // Fetch options for each level where parent is selected
     levels.forEach(({ level_order, level_name }) => {
       const parent = levels.find((lvl) => lvl.level_order === level_order - 1);
       const parentValue = parent ? restored[parent.level_name] : null;
-
       if (restored[level_name]) {
         fetchOptionsForLevel(level_name, parentValue);
       }
     });
 
     onSelectionChange?.(restored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, levels]);
 
-
+  // Fetch options for a specific level given optional parent value
   const fetchOptionsForLevel = async (levelName, parentValue = null) => {
+    setLoadingLevel(levelName);
     try {
-      setLoadingLevel(levelName);
       const response = await axios.get(
         "http://localhost:5000/api/location/location-options",
         {
@@ -82,65 +80,60 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
           },
         }
       );
-
       if (response.data?.options) {
         setLocationOptions((prev) => ({
           ...prev,
           [levelName]: response.data.options,
         }));
       }
-    } catch (error) {
-      console.error(`Error fetching options for ${levelName}:`, error);
+    } catch (err) {
+      console.error(`Error fetching options for ${levelName}:`, err);
     } finally {
-      setLoadingLevel(null); // Stop spinner
+      setLoadingLevel(null);
     }
   };
 
+  // Handle selection changes for a level
   const handleLevelChange = (levelName, value, levelOrder) => {
-    const updatedSelectedValues = {
-      ...selectedValues,
+    const selectedVal = value?.value || value;
 
-      [levelName]: value?.value || value,
-    };
+    // Update selectedValues state
+    const updatedSelected = { ...selectedValues, [levelName]: selectedVal };
 
-    // Update state once
-    setSelectedValues(updatedSelectedValues);
+    setSelectedValues(updatedSelected);
+    onSelectionChange?.(updatedSelected);
 
-    // Call parent callback with updated selection
-    onSelectionChange?.(updatedSelectedValues);
-
-    // Clear dependent lower levels
+    // Clear options and form values for all child levels
     setLocationOptions((prev) => {
-      const updated = { ...prev };
+      const updatedOptions = { ...prev };
       levels.forEach(({ level_order: lo, level_name: ln }) => {
-        if (lo > levelOrder) delete updated[ln];
+        if (lo > levelOrder) delete updatedOptions[ln];
       });
-      return updated;
+      return updatedOptions;
     });
 
-    // Also clear selected values for child levels in the form
-    const clearedSelectedValues = { ...updatedSelectedValues };
+    // Clear form values and selected values for child levels
+    const clearedSelected = { ...updatedSelected };
     levels.forEach(({ level_order: lo, level_name: ln }) => {
       if (lo > levelOrder) {
         form.setFieldValue(
           [fieldNamePrefix, "locationLevels", `level_${lo}`],
           undefined
         );
-        delete clearedSelectedValues[ln];
+        delete clearedSelected[ln];
       }
     });
 
-    // Update state again and notify parent with cleared values
-    setSelectedValues(clearedSelectedValues);
-    onSelectionChange?.(clearedSelectedValues);
+    setSelectedValues(clearedSelected);
+    onSelectionChange?.(clearedSelected);
 
-    // Find the next level
+    // Fetch options for next level if exists
     const nextLevel = levels.find((lvl) => lvl.level_order === levelOrder + 1);
-
     if (nextLevel) {
-      fetchOptionsForLevel(nextLevel.level_name, value);
+      fetchOptionsForLevel(nextLevel.level_name, selectedVal);
     }
   };
+
   if (isHierarchyLoading) {
     return (
       <div style={{ textAlign: "center", marginTop: 32 }}>
@@ -148,9 +141,10 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
       </div>
     );
   }
+
   return (
     <Row gutter={[16, 16]} wrap>
-      {levels.map(({ level_order, level_name }, index) => {
+      {levels.map(({ level_order, level_name }) => {
         const parent = levels.find(
           (lvl) => lvl.level_order === level_order - 1
         );
@@ -161,17 +155,19 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
             <Form.Item
               name={[fieldNamePrefix, "locationLevels", `level_${level_order}`]}
               label={level_name}
-              rules={[{ required: true, message: `Please select ${level_name}` }]}
-
+              rules={[
+                { required: true, message: `Please select ${level_name}` },
+              ]}
             >
               <Select
                 placeholder={`Select a ${level_name}`}
-                onChange={(value) =>
-                  handleLevelChange(level_name, value, level_order)
+                onChange={(val) =>
+                  handleLevelChange(level_name, val, level_order)
                 }
                 value={selectedValues[level_name] || undefined}
                 disabled={isDisabled}
                 loading={loadingLevel === level_name}
+                allowClear
               >
                 {(locationOptions[level_name] || []).map((option) => (
                   <Option key={option} value={option}>
@@ -186,4 +182,5 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
     </Row>
   );
 };
+
 export default LocationSelector;
