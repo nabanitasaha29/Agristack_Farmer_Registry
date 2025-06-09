@@ -3,10 +3,14 @@ import { Form, Input, InputNumber, Select, Button } from "antd";
 
 const { Option } = Select;
 
-const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues }, ref) => {
+const AgriculturalForm = forwardRef(({ 
+  onSubmit, 
+  onFinalAction, 
+  initialValues,
+  landUnit 
+}, ref) => {
   const [form] = Form.useForm();
 
-  // Expose form methods via ref
   React.useImperativeHandle(ref, () => ({
     submit: () => form.submit(),
     validateFields: () => form.validateFields(),
@@ -18,18 +22,8 @@ const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues },
     form.setFieldsValue(initialValues);
   }, [initialValues, form]);
 
-  const handleFinish = (values) => {
-    onSubmit(values);
-    console.log(values);
-  };
-
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleFinish}
-      initialValues={initialValues}
-    >
+    <Form form={form} layout="vertical">
       <h2>Agricultural Details</h2>
 
       <Form.Item
@@ -45,56 +39,63 @@ const AgriculturalForm = forwardRef(({ onSubmit, onFinalAction, initialValues },
       </Form.Item>
 
       <Form.Item
-        name="fr_farmer_category"
-        label="Farmer Category"
-        rules={[{ required: true, message: "Please select Farmer Category" }]}
-      >
-        <Select>
-          <Option value="Small">Small</Option>
-          <Option value="Medium">Medium</Option>
-          <Option value="Large">Large</Option>
-        </Select>
-      </Form.Item>
+  name="fr_farmer_category"
+  label="Farmer Category"
+  rules={[{ required: true, message: "Please select Farmer Category" }]}
+>
+  <Select disabled>
+    <Option value="Small">Small</Option>
+    <Option value="Medium">Medium</Option>
+    <Option value="Large">Large</Option>
+  </Select>
+</Form.Item>
 
-      <Form.Item
-        name="fr_total_land_area_owned"
-        label="Total Land Area Owned"
-        rules={[{ required: true, message: "Please input Total Land Area Owned" }]}
-      >
-        <InputNumber style={{ width: "100%" }} />
-      </Form.Item>
+<Form.Item
+  name="fr_total_land_area_owned"
+  label={`Total Land Area Owned (${landUnit})`}
+>
+  <InputNumber 
+    style={{ width: "100%" }} 
+    readOnly 
+    formatter={value => `${value} ${landUnit}`}
+    parser={value => value.replace(` ${landUnit}`, '')}
+  />
+</Form.Item>
 
-      <Form.Item
-        name="fr_no_of_lands_owned"
-        label="Number of Lands Owned"
-        rules={[{ required: true, message: "Please input Number of Lands Owned" }]}
-      >
-        <InputNumber style={{ width: "100%" }} />
-      </Form.Item>
+<Form.Item
+  name="fr_no_of_lands_owned"
+  label="Number of Lands Owned"
+>
+  <InputNumber style={{ width: "100%" }} readOnly />
+</Form.Item>
+
 
       <div style={{ marginTop: "16px" }}>
         <Button
-          htmlType="submit"
-          className="next-button"
-          onClick={() => onFinalAction("submit")}
           type="primary"
+          onClick={() => {
+            form.validateFields()
+              .then(values => {
+                onSubmit(values);
+                onFinalAction("submit");
+              })
+              .catch(() => message.error("Please fill all required fields"));
+          }}
           style={{ marginRight: "8px" }}
         >
           Submit
         </Button>
         <Button
-          className="draft-button"
           onClick={() => onFinalAction("draft")}
           style={{ marginRight: "8px" }}
         >
           Save as Draft
         </Button>
         <Button
-          className="restart-button"
           onClick={() => onFinalAction("restart")}
           danger
         >
-          Restart
+          Reset
         </Button>
       </div>
     </Form>

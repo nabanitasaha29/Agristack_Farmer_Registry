@@ -29,8 +29,10 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
   React.useImperativeHandle(ref, () => ({
     submit: () => form.submit(),
     validateFields: () => form.validateFields(),
-    getFieldsValue: () => form.getFieldsValue(),
-    getLands: () => lands,
+    getFieldsValue: () => ({
+      ...form.getFieldsValue(),
+      lands // ✅ Ensure lands are included
+    }),
     reset: () => {
       form.resetFields();
       setLands([]);
@@ -55,22 +57,18 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
           axios.get("http://localhost:5000/api/location/area-unit")
         ]);
 
-        const parsedHierarchy = (hierarchyRes.data?.hierarchy || []).map(level => ({
-          levelOrder: level.level_order,
-          levelName: level.level_name
-        }));
-
-        setLocationHierarchy(parsedHierarchy);
+        setLocationHierarchy(
+          (hierarchyRes.data?.hierarchy || []).map(level => ({
+            levelOrder: level.level_order,
+            levelName: level.level_name
+          }))
+        );
 
         setLandIdentifiers(
           identifiersRes.data?.landIdentifiers?.map((id, index) => ({
             ...id,
             key: id.key || `id_${index}`
-          })) || [
-            { name: "Survey Number", required: true, key: "surveyNo" },
-            { name: "Sub-Division Number", required: false, key: "subDivisionNo" },
-            { name: "Plot Number", required: true, key: "plotNo" }
-          ]
+          })) || []
         );
 
         setAreaUnit(areaUnitRes.data?.areaUnit || "hectares");
@@ -92,14 +90,11 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
       return;
     }
 
-    // Convert selected levels to *_name format
     const locationData = {};
     locationHierarchy.forEach(level => {
       const val = landLocation[`level_${level.levelOrder}`];
       if (val) locationData[`level_${level.levelOrder}_name`] = val;
     });
-
-    console.log("Saving land with location:", locationData);
 
     const newLand = {
       ...values,
@@ -112,6 +107,19 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
     form.resetFields();
     setLandLocation({});
     message.success("Land added successfully");
+  };
+
+  const handleSubmit = () => {
+    if (lands.length === 0) {
+      message.warning("Please add at least one land entry");
+      return;
+    }
+    onSubmit({ lands });
+  };
+
+  const handleDeleteLand = (id) => {
+    setLands(lands.filter(land => land.id !== id));
+    message.success("Land removed successfully");
   };
 
   const generateTableColumns = () => {
@@ -148,29 +156,12 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
         title: 'Action',
         key: 'action',
         render: (_, record) => (
-          <Button
-            type="link"
-            danger
-            onClick={() => handleDeleteLand(record.id)}
-          >
+          <Button type="link" danger onClick={() => handleDeleteLand(record.id)}>
             Delete
           </Button>
         )
       }
     ];
-  };
-
-  const handleDeleteLand = (id) => {
-    setLands(lands.filter(land => land.id !== id));
-    message.success("Land removed successfully");
-  };
-
-  const handleSubmit = () => {
-    if (lands.length === 0) {
-      message.warning("Please add at least one land entry");
-      return;
-    }
-    onSubmit({ lands });
   };
 
   if (loading) {
@@ -183,12 +174,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
 
   return (
     <Card title={<Title level={4}>Land Details</Title>}>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleAddLand}
-        initialValues={initialValues}
-      >
+      <Form form={form} layout="vertical" onFinish={handleAddLand}>
         <LocationSelector
           form={form}
           fieldNamePrefix="landLocationLevels"
@@ -196,7 +182,6 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
           onSelectionChange={(selected) => {
             const newLocation = {};
             locationHierarchy.forEach(level => {
-              // Normalize selection using level order or fallback to level name
               const matchKey = Object.keys(selected).find(
                 key =>
                   key.toLowerCase() === level.levelName.toLowerCase() ||
@@ -206,7 +191,6 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
                 newLocation[`level_${level.levelOrder}`] = selected[matchKey];
               }
             });
-            console.log("Selected Location:", newLocation);
             setLandLocation(newLocation);
           }}
         />
@@ -235,18 +219,11 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
               label="Land Area"
               rules={[{ required: true, message: "Please enter land area" }]}
             >
-              <InputNumber
-                style={{ width: "100%" }}
-                min={0}
-                addonAfter={areaUnit}
-              />
+              <InputNumber style={{ width: "100%" }} min={0} addonAfter={areaUnit} />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
-              name="fr_land_geometry"
-              label="Land Geometry"
-            >
+            <Form.Item name="fr_land_geometry" label="Land Geometry">
               <Input placeholder="GeoJSON or coordinates" />
             </Form.Item>
           </Col>
@@ -283,8 +260,3 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
 });
 
 export default LandForm;
-
-
-
-
-

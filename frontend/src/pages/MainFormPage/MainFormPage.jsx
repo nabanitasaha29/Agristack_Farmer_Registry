@@ -1,5 +1,3 @@
-// testing
-
 import React, { useState, useRef } from "react";
 import moment from "moment";
 import "./MainFormPage.css";
@@ -11,16 +9,14 @@ import TabsNavigation from "../../components/TabsNavigation";
 import { message } from "antd";
 
 const MainFormPage = () => {
-  const [activeTab, setActiveTab] = useState(1); // Tracks the current active tab
+  const [activeTab, setActiveTab] = useState(1);
   const [formData, setFormData] = useState({
-    // Stores form data across tabs
     demographic: {},
     agricultural: {},
-    land: {},
+    land: { entries: [] },
   });
 
   const formRefs = {
-    // Refs to access form methods from each form
     1: useRef(null),
     2: useRef(null),
     3: useRef(null),
@@ -30,14 +26,20 @@ const MainFormPage = () => {
     const currentFormRef = formRefs[activeTab];
     if (currentFormRef?.current) {
       try {
-        await currentFormRef.current.validateFields(); // Validate current form
-        const formValues = currentFormRef.current.getFieldsValue(); // Get current form values
+        await currentFormRef.current.validateFields();
+        const formValues = currentFormRef.current.getFieldsValue();
+
+        if (activeTab === 2 && formValues.lands) {
+          formValues.entries = formValues.lands; // ✅ Sync lands to entries
+        }
+
         setFormData((prev) => ({
           ...prev,
           ...(activeTab === 1 && { demographic: formValues }),
           ...(activeTab === 2 && { land: formValues }),
           ...(activeTab === 3 && { agricultural: formValues }),
         }));
+
         return true;
       } catch (error) {
         message.error("Please fill all required fields before proceeding");
@@ -48,50 +50,74 @@ const MainFormPage = () => {
   };
 
   const handleTabChange = async (newTab) => {
-    const isValid = await validateAndSaveCurrentForm(); // Save current tab before changing
+    const isValid = await validateAndSaveCurrentForm();
     if (isValid) {
       setActiveTab(newTab);
     }
   };
 
-  // Handles submission of DemographicForm
   const handleDemographicSubmit = (data) => {
     setFormData((prev) => ({ ...prev, demographic: data }));
     setActiveTab(2);
   };
 
-  // Handles submission of LandForm
   const handleLandSubmit = (data) => {
-    setFormData((prev) => ({ ...prev, land: data }));
+    setFormData((prev) => ({
+      ...prev,
+      land: {
+        ...data,
+        entries: data.lands || prev.land?.entries || []
+      }
+    }));
     setActiveTab(3);
   };
 
-  // Handles submission of AgriculturalForm
   const handleAgriculturalSubmit = (data) => {
     setFormData((prev) => ({ ...prev, agricultural: data }));
+  };
+
+  const calculateAgriculturalData = (landEntries) => {
+    if (!landEntries || landEntries.length === 0) {
+      return {
+        fr_no_of_lands_owned: 0,
+        fr_total_land_area_owned: 0,
+        fr_farmer_category: 'Small'
+      };
+    }
+
+    const totalArea = landEntries.reduce((sum, land) => {
+      return sum + (parseFloat(land.fr_land_area) || 0);
+    }, 0);
+
+    const landCount = landEntries.length;
+    let farmerCategory = 'Small';
+    if (totalArea > 10) farmerCategory = 'Large';
+    else if (totalArea > 5) farmerCategory = 'Medium';
+
+    return {
+      fr_no_of_lands_owned: landCount,
+      fr_total_land_area_owned: totalArea.toFixed(2),
+      fr_farmer_category: farmerCategory
+    };
   };
 
   const handleFinalAction = async (action) => {
     if (action === "submit") {
       const { demographic, land, agricultural } = formData;
-
-      const selectedLocation = demographic.selectedLocation || {}; // location from DemographicForm
-      const landLocation = land.landLocation || {}; // location from LandForm
+      const selectedLocation = demographic.selectedLocation || {};
+      const landEntries = land.entries || [];
+      const landLocation = landEntries[0]?.landLocation || {};
 
       const demographicPayload = {
         fr_full_name: demographic.fr_full_name || "",
         fr_local_language_name: demographic.fr_local_language_name || "",
-        fr_dob: demographic.fr_dob
-          ? moment(demographic.fr_dob).format("YYYY-MM-DD")
-          : "",
+        fr_dob: demographic.fr_dob ? moment(demographic.fr_dob).format("YYYY-MM-DD") : "",
         fr_gender: demographic.fr_gender || "",
         fr_social_category: demographic.fr_social_category || "",
         fr_email: demographic.fr_email || "",
         fr_id_proof_type: demographic.fr_id_proof_type || "",
         fr_id_proof_number: demographic.fr_id_proof_number || "",
-        fr_mobile_number: demographic.fr_mobile_number
-          ? demographic.fr_mobile_number.replace(/\D/g, "")
-          : "",
+        fr_mobile_number: demographic.fr_mobile_number?.replace(/\D/g, "") || "",
         fr_address_line_1: demographic.fr_address_line_1 || "",
         fr_address_line_2: demographic.fr_address_line_2 || "",
         fr_local_language_address: demographic.fr_local_language_address || "",
@@ -105,20 +131,6 @@ const MainFormPage = () => {
         fr_level_6_id: selectedLocation["Hamlet"] || "",
       };
 
-      const landEntry = {
-        fr_land_identifier_1: land.fr_land_identifier_1 || "",
-        fr_land_identifier_2: land.fr_land_identifier_2 || "",
-        fr_land_identifier_3: land.fr_land_identifier_3 || "",
-        fr_land_area: land.fr_land_area || 0,
-        fr_area_unit: land.fr_area_unit || "Acre",
-        fr_level_1_id: landLocation.State || "",
-        fr_level_2_id: landLocation["Local Government"] || "",
-        fr_level_3_id: landLocation.Ward || "",
-        fr_level_4_id: landLocation["Village/Block"] || "",
-        fr_level_5_id: landLocation["Sub-village"] || "",
-        fr_level_6_id: landLocation["Hamlet"] || "",
-      };
-
       const finalPayload = {
         demographic: demographicPayload,
         agricultural: {
@@ -128,18 +140,26 @@ const MainFormPage = () => {
           fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || "",
         },
         land: {
-          entries: [landEntry],
-        },
+          entries: landEntries.map(entry => ({
+            fr_land_identifier_1: entry.fr_land_identifier_1 || "",
+            fr_land_identifier_2: entry.fr_land_identifier_2 || "",
+            fr_land_identifier_3: entry.fr_land_identifier_3 || "",
+            fr_land_area: entry.fr_land_area || 0,
+            fr_area_unit: entry.fr_area_unit || "Acre",
+            fr_level_1_id: entry.landLocation?.State || "",
+            fr_level_2_id: entry.landLocation?.["Local Government"] || "",
+            fr_level_3_id: entry.landLocation?.Ward || "",
+            fr_level_4_id: entry.landLocation?.["Village/Block"] || "",
+            fr_level_5_id: entry.landLocation?.["Sub-village"] || "",
+            fr_level_6_id: entry.landLocation?.["Hamlet"] || "",
+          }))
+        }
       };
 
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/farmer/register",
-          finalPayload
-        );
+        const response = await axios.post("http://localhost:5000/api/farmer/register", finalPayload);
         alert("Form submitted successfully!");
         console.log("Server response:", response.data);
-        console.log("Final Payload:", finalPayload);
       } catch (error) {
         console.error("Error submitting form:", error);
         alert("Failed to submit form. Please try again.");
@@ -147,7 +167,7 @@ const MainFormPage = () => {
     } else if (action === "draft") {
       alert("Form saved as draft:\n" + JSON.stringify(formData, null, 2));
     } else if (action === "restart") {
-      setFormData({ demographic: {}, agricultural: {}, land: {} });
+      setFormData({ demographic: {}, agricultural: {}, land: { entries: [] } });
       setActiveTab(1);
     }
   };
@@ -167,7 +187,10 @@ const MainFormPage = () => {
           <LandForm
             ref={formRefs[2]}
             onSubmit={handleLandSubmit}
-            initialValues={formData.land}
+            initialValues={{
+              ...formData.land,
+              lands: formData.land?.entries
+            }}
           />
         )}
         {activeTab === 3 && (
@@ -175,7 +198,11 @@ const MainFormPage = () => {
             ref={formRefs[3]}
             onSubmit={handleAgriculturalSubmit}
             onFinalAction={handleFinalAction}
-            initialValues={formData.agricultural}
+            initialValues={{
+              ...formData.agricultural,
+              ...calculateAgriculturalData(formData.land?.entries || [])
+            }}
+            landUnit={formData.land?.entries?.[0]?.fr_area_unit || 'acres'}
           />
         )}
       </div>
