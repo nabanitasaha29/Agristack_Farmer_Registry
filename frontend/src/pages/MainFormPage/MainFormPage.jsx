@@ -103,7 +103,13 @@ const MainFormPage = () => {
 
   const handleFinalAction = async (action) => {
     if (action === "submit") {
-      const { demographic, land, agricultural } = formData;
+      const { demographic, land, } = formData;
+      
+    let agricultural = formData.agricultural;
+    if (formRefs[3]?.current) {
+      const validated = await formRefs[3].current.validateFields();
+      agricultural = validated;
+    }
       const locationLevels = demographic.locationLevels || {};
       const landEntries = land.entries || [];
 

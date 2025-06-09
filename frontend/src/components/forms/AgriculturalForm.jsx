@@ -1,11 +1,27 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect,useState } from "react";
 import { Form, Input, InputNumber, Select, Button } from "antd";
+import axios from "axios";
+
 
 const { Option } = Select;
 
 const AgriculturalForm = forwardRef(
-  ({ onSubmit, onFinalAction, initialValues, landUnit }, ref) => {
+  ({ onSubmit, onFinalAction, initialValues}, ref) => {
     const [form] = Form.useForm();
+    const [areaUnit, setAreaUnit] = useState("hectares");
+
+useEffect(() => {
+  const fetchAreaUnit = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/location/area-unit");
+      setAreaUnit(res.data?.areaUnit || "hectares");
+    } catch (error) {
+      console.error("Failed to fetch area unit:", error);
+    }
+  };
+
+  fetchAreaUnit();
+}, []);
 
     React.useImperativeHandle(ref, () => ({
       submit: () => form.submit(),
@@ -48,13 +64,13 @@ const AgriculturalForm = forwardRef(
 
         <Form.Item
           name="fr_total_land_area_owned"
-          label={`Total Land Area Owned (${landUnit})`}
+          label={`Total Land Area Owned (${areaUnit})`}
         >
           <InputNumber
             style={{ width: "100%" }}
             readOnly
-            formatter={(value) => `${value} ${landUnit}`}
-            parser={(value) => value.replace(` ${landUnit}`, "")}
+            formatter={(value) => `${value} ${areaUnit}`}
+            parser={(value) => value.replace(` ${areaUnit}`, "")}
           />
         </Form.Item>
 
