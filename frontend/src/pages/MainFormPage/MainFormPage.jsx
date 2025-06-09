@@ -31,8 +31,13 @@ const MainFormPage = () => {
       try {
         await currentFormRef.current.validateFields();
         const formValues = currentFormRef.current.getFieldsValue();
-
-        // For LandForm, sync lands[] to entries[]
+        //new
+        if (activeTab === 1 && formValues.fr_mobile_number) {
+          const prevMobile = formData.demographic.fr_mobile_number || "";
+          if (prevMobile.startsWith("+")) {
+            formValues.fr_mobile_number = prevMobile; // Keep it formatted
+          }
+        }
         if (activeTab === 2 && formValues.lands) {
           formValues.entries = formValues.lands;
         }

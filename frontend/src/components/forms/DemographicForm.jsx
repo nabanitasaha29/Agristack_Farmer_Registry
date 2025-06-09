@@ -40,9 +40,23 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
         setPostalCodeConfig(res.data.postalCodeConfig);
       });
   }, []);
+  // useEffect(() => {
+  //   form.setFieldsValue(initialValues);
+  // }, [initialValues, form]);
+  //new
   useEffect(() => {
-    form.setFieldsValue(initialValues);
-  }, [initialValues, form]);
+    // Remove mobile code from fr_mobile_number if it exists
+    let updatedValues = { ...initialValues };
+
+    if (initialValues?.fr_mobile_number?.startsWith(`+${mobileCode}`)) {
+      updatedValues.fr_mobile_number = initialValues.fr_mobile_number.replace(
+        `+${mobileCode}`,
+        ""
+      );
+    }
+
+    form.setFieldsValue(updatedValues);
+  }, [initialValues, mobileCode, form]);
 
   useEffect(() => {
     const fetchCountryAndMobileCode = async () => {
