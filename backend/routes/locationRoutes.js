@@ -134,4 +134,24 @@ router.get("/postal-code-config", (req, res) => {
 
 
 
+
+// New route for land identifiers
+router.get("/land-identifiers", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.landIdentifiers) {
+    return res
+      .status(404)
+      .json({ error: "Land identifiers not found for active country" });
+  }
+
+  res.json({
+    countryCode: activeCountry,
+    landIdentifiers: config.landIdentifiers,
+  });
+});
+
+
+
 export default router;

@@ -1,239 +1,290 @@
-// import React, { forwardRef, useState, useEffect } from "react";
-// import { Form, Input, InputNumber, Button, Row, Col } from "antd";
-// import LocationSelector from "../LocationSelector";
-// import axios from "axios";
-
-// const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
-//   const [form] = Form.useForm();
-//   const [landLocation, setLandLocation] = useState(
-//     initialValues.landLocation || {}
-//   );
-//   const [areaUnit, setAreaUnit] = useState("");
-
-//   // Expose form methods via ref
-//    React.useImperativeHandle(ref, () => ({
-//     submit: () => form.submit(),
-//     validateFields: () => form.validateFields(),
-//     getFieldsValue: () => form.getFieldsValue(),
-//   }));
-
-//   useEffect(() => {
-//     form.setFieldsValue(initialValues);
-//   }, [initialValues, form]);
-
-//   useEffect(() => {
-//     const fetchAreaUnit = async () => {
-//       try {
-//         const response = await axios.get(
-//           "http://localhost:5000/api/location/area-unit"
-//         );
-//         setAreaUnit(response.data.areaUnit);
-//       } catch (error) {
-//         console.error("Failed to fetch area unit", error);
-//       }
-//     };
-
-//     fetchAreaUnit();
-//   }, []);
-
-//   const handleFinish = (values) => {
-//     console.log(values);
-//     onSubmit({
-//       ...values,
-//       landLocation: landLocation,
-//     });
-//     console.log(values);
-//     console.log(landLocation);
-//   };
-
-//   return (
-//     <Form
-//       form={form}
-//       layout="vertical"
-//       onFinish={handleFinish}
-//       initialValues={initialValues}
-//     >
-//       <h2>Land Details</h2>
-
-//       <LocationSelector
-//         form={form}
-//         fieldNamePrefix="landLocationLevels"
-//         onSelectionChange={setLandLocation}
-//       />
-
-//       <Row gutter={16}>
-//         <Col span={8}>
-//           <Form.Item
-//             name="fr_land_identifier_1"
-//             label="Land Identifier 1"
-//             rules={[{ required: true }]}
-//           >
-//             <Input />
-//           </Form.Item>
-//         </Col>
-//         <Col span={8}>
-//           <Form.Item name="fr_land_identifier_2" label="Land Identifier 2">
-//             <Input />
-//           </Form.Item>
-//         </Col>
-//         <Col span={8}>
-//           <Form.Item name="fr_land_identifier_3" label="Land Identifier 3">
-//             <Input />
-//           </Form.Item>
-//         </Col>
-//       </Row>
-
-//       <Row gutter={16}>
-//         <Col span={12}>
-//           <Form.Item
-//             name="fr_land_area"
-//             label="Land Area"
-//             rules={[{ required: true }]}
-//           >
-//             <InputNumber style={{ width: "100%" }} addonAfter={areaUnit} />
-//           </Form.Item>
-//         </Col>
-//         <Col span={12}></Col>
-//       </Row>
-
-//       <Form.Item name="fr_land_geometry" label="Land Geometry">
-//         <Input placeholder="GeoJSON or coordinates" />
-//       </Form.Item>
-
-//       <Button className="next-button" type="primary" htmlType="submit">
-//         Next
-//       </Button>
-//     </Form>
-//   );
-// });
-
-// export default LandForm;
-
-
-
-
 import React, { forwardRef, useState, useEffect } from "react";
-import { Form, Input, InputNumber, Button, Row, Col } from "antd";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Row,
+  Col,
+  Table,
+  Card,
+  Typography,
+  message,
+  Skeleton
+} from "antd";
 import LocationSelector from "../LocationSelector";
 import axios from "axios";
 
-const LandForm = forwardRef(({ onSubmit, initialValues }, ref) => {
+const { Title } = Typography;
+
+const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
   const [form] = Form.useForm();
   const [landLocation, setLandLocation] = useState(initialValues.landLocation || {});
   const [areaUnit, setAreaUnit] = useState("");
   const [landIdentifiers, setLandIdentifiers] = useState([]);
+  const [locationHierarchy, setLocationHierarchy] = useState([]);
+  const [lands, setLands] = useState(initialValues.lands || []);
+  const [loading, setLoading] = useState(true);
 
-  // Expose form methods via ref
   React.useImperativeHandle(ref, () => ({
     submit: () => form.submit(),
     validateFields: () => form.validateFields(),
     getFieldsValue: () => form.getFieldsValue(),
+    getLands: () => lands,
+    reset: () => {
+      form.resetFields();
+      setLands([]);
+      setLandLocation({});
+    }
   }));
 
   useEffect(() => {
     form.setFieldsValue(initialValues);
+    if (initialValues.lands) {
+      setLands(initialValues.lands);
+    }
   }, [initialValues, form]);
 
   useEffect(() => {
-    const fetchCountryData = async () => {
+    const fetchCountryConfig = async () => {
       try {
-        // Fetch area unit
-        const areaRes = await axios.get(
-          "http://localhost:5000/api/location/area-unit"
-        );
-        setAreaUnit(areaRes.data.areaUnit);
-
-        // Fetch land identifiers configuration
-        const countryRes = await axios.get(
-          "http://localhost:5000/api/location/active-country"
-        );
-        const countryCode = countryRes.data.countryCode || "IN";
-
-        const configRes = await axios.get(
-          "http://localhost:5000/api/location/config"
-        );
-        const countryConfig = configRes.data.countryConfigs[countryCode];
-
-        if (countryConfig && countryConfig.landIdentifiers) {
-          setLandIdentifiers(countryConfig.landIdentifiers);
-        }
-      } catch (error) {
-        console.error("Failed to fetch country data:", error);
-        // Default to India's configuration
-        setLandIdentifiers([
-          { name: "Survey Number", required: true },
-          { name: "Sub-Division Number", required: false },
-          { name: "Plot Number", required: true }
+        setLoading(true);
+        const [hierarchyRes, identifiersRes, areaUnitRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/location/hierarchy"),
+          axios.get("http://localhost:5000/api/location/land-identifiers"),
+          axios.get("http://localhost:5000/api/location/area-unit")
         ]);
+
+        const parsedHierarchy = (hierarchyRes.data?.hierarchy || []).map(level => ({
+          levelOrder: level.level_order,
+          levelName: level.level_name
+        }));
+
+        setLocationHierarchy(parsedHierarchy);
+
+        setLandIdentifiers(
+          identifiersRes.data?.landIdentifiers?.map((id, index) => ({
+            ...id,
+            key: id.key || `id_${index}`
+          })) || [
+            { name: "Survey Number", required: true, key: "surveyNo" },
+            { name: "Sub-Division Number", required: false, key: "subDivisionNo" },
+            { name: "Plot Number", required: true, key: "plotNo" }
+          ]
+        );
+
+        setAreaUnit(areaUnitRes.data?.areaUnit || "hectares");
+
+      } catch (error) {
+        console.error("Failed to fetch country config:", error);
+        message.warning("Using default configuration");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchCountryData();
+    fetchCountryConfig();
   }, []);
 
-  const handleFinish = (values) => {
-    onSubmit({
-      ...values,
-      landLocation: landLocation,
+  const handleAddLand = (values) => {
+    if (!landLocation || Object.keys(landLocation).length === 0) {
+      message.error("Please select a location");
+      return;
+    }
+
+    // Convert selected levels to *_name format
+    const locationData = {};
+    locationHierarchy.forEach(level => {
+      const val = landLocation[`level_${level.levelOrder}`];
+      if (val) locationData[`level_${level.levelOrder}_name`] = val;
     });
+
+    console.log("Saving land with location:", locationData);
+
+    const newLand = {
+      ...values,
+      landLocation: locationData,
+      id: Date.now(),
+      areaUnit
+    };
+
+    setLands([...lands, newLand]);
+    form.resetFields();
+    setLandLocation({});
+    message.success("Land added successfully");
   };
 
+  const generateTableColumns = () => {
+    const locationColumns = locationHierarchy
+      .sort((a, b) => a.levelOrder - b.levelOrder)
+      .map(level => ({
+        title: level.levelName,
+        key: `level_${level.levelOrder}`,
+        render: (_, record) => record.landLocation?.[`level_${level.levelOrder}_name`] || "-"
+      }));
+
+    const identifierColumns = landIdentifiers.map((identifier, index) => ({
+      title: identifier.name,
+      dataIndex: `fr_land_identifier_${index + 1}`,
+      key: identifier.key,
+      render: (text) => text || '-'
+    }));
+
+    return [
+      ...locationColumns,
+      ...identifierColumns,
+      {
+        title: `Area (${areaUnit})`,
+        key: 'area',
+        render: (_, record) => `${record.fr_land_area} ${areaUnit}`
+      },
+      {
+        title: 'Geometry',
+        dataIndex: 'fr_land_geometry',
+        key: 'geometry',
+        render: (text) => text || "-"
+      },
+      {
+        title: 'Action',
+        key: 'action',
+        render: (_, record) => (
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDeleteLand(record.id)}
+          >
+            Delete
+          </Button>
+        )
+      }
+    ];
+  };
+
+  const handleDeleteLand = (id) => {
+    setLands(lands.filter(land => land.id !== id));
+    message.success("Land removed successfully");
+  };
+
+  const handleSubmit = () => {
+    if (lands.length === 0) {
+      message.warning("Please add at least one land entry");
+      return;
+    }
+    onSubmit({ lands });
+  };
+
+  if (loading) {
+    return (
+      <Card title={<Title level={4}>Land Details</Title>}>
+        <Skeleton active paragraph={{ rows: 6 }} />
+      </Card>
+    );
+  }
+
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleFinish}
-      initialValues={initialValues}
-    >
-      <h2>Land Details</h2>
-
-      <LocationSelector
+    <Card title={<Title level={4}>Land Details</Title>}>
+      <Form
         form={form}
-        fieldNamePrefix="landLocationLevels"
-        onSelectionChange={setLandLocation}
-      />
+        layout="vertical"
+        onFinish={handleAddLand}
+        initialValues={initialValues}
+      >
+        <LocationSelector
+          form={form}
+          fieldNamePrefix="landLocationLevels"
+          hierarchy={locationHierarchy}
+          onSelectionChange={(selected) => {
+            const newLocation = {};
+            locationHierarchy.forEach(level => {
+              // Normalize selection using level order or fallback to level name
+              const matchKey = Object.keys(selected).find(
+                key =>
+                  key.toLowerCase() === level.levelName.toLowerCase() ||
+                  key === `level_${level.levelOrder}`
+              );
+              if (matchKey && selected[matchKey]) {
+                newLocation[`level_${level.levelOrder}`] = selected[matchKey];
+              }
+            });
+            console.log("Selected Location:", newLocation);
+            setLandLocation(newLocation);
+          }}
+        />
 
-      <Row gutter={16}>
-        {landIdentifiers.map((identifier, index) => (
-          <Col span={8} key={index}>
-            <Form.Item
-              name={`fr_land_identifier_${index + 1}`}
-              label={identifier.name}
-              rules={[
-                {
+        <Row gutter={16}>
+          {landIdentifiers.map((identifier, index) => (
+            <Col span={8} key={index}>
+              <Form.Item
+                name={`fr_land_identifier_${index + 1}`}
+                label={identifier.name}
+                rules={[{
                   required: identifier.required,
                   message: `Please enter ${identifier.name}`
-                }
-              ]}
+                }]}
+              >
+                <Input placeholder={`Enter ${identifier.name}`} />
+              </Form.Item>
+            </Col>
+          ))}
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="fr_land_area"
+              label="Land Area"
+              rules={[{ required: true, message: "Please enter land area" }]}
             >
-              <Input placeholder={`Enter ${identifier.name}`} />
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                addonAfter={areaUnit}
+              />
             </Form.Item>
           </Col>
-        ))}
-      </Row>
+          <Col span={12}>
+            <Form.Item
+              name="fr_land_geometry"
+              label="Land Geometry"
+            >
+              <Input placeholder="GeoJSON or coordinates" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="fr_land_area"
-            label="Land Area"
-            rules={[{ required: true, message: "Please enter Land Area" }]}
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Add Land
+          </Button>
+        </Form.Item>
+      </Form>
+
+      {lands.length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <Table
+            columns={generateTableColumns()}
+            dataSource={lands}
+            rowKey="id"
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+            bordered
+          />
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            style={{ marginTop: 16, float: 'right' }}
           >
-            <InputNumber style={{ width: "100%" }} addonAfter={areaUnit} />
-          </Form.Item>
-        </Col>
-        <Col span={12}></Col>
-      </Row>
-
-      <Form.Item name="fr_land_geometry" label="Land Geometry">
-        <Input placeholder="GeoJSON or coordinates" />
-      </Form.Item>
-
-      <Button className="next-button" type="primary" htmlType="submit">
-        Next
-      </Button>
-    </Form>
+            Save and Continue
+          </Button>
+        </div>
+      )}
+    </Card>
   );
 });
 
 export default LandForm;
+
+
+
+
+
