@@ -22,7 +22,12 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   React.useImperativeHandle(ref, () => ({
     submit: () => form.submit(),
     validateFields: () => form.validateFields(),
-    getFieldsValue: () => form.getFieldsValue(),
+    // getFieldsValue: () => form.getFieldsValue(),
+    getFieldsValue: () => ({
+      ...form.getFieldsValue(),
+      fr_mobile_number: `+${mobileCode}${form.getFieldValue("fr_mobile_number")}`,
+      locationLevels: selectedLocation, // <-- Ensure location is returned
+    }),
   }));
 
   useEffect(() => {
