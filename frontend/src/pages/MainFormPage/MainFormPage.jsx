@@ -32,7 +32,12 @@ const MainFormPage = () => {
     try {
       await currentFormRef.current.validateFields();
       const formValues = currentFormRef.current.getFieldsValue();
-
+      if (activeTab === 1 && formValues.fr_mobile_number) {
+        const prevMobile = formData.demographic.fr_mobile_number || "";
+        if (prevMobile.startsWith("+")) {
+          formValues.fr_mobile_number = prevMobile;
+        }
+      }
       if (activeTab === 2 && formValues.lands) {
         formValues.entries = formValues.lands;
       }
