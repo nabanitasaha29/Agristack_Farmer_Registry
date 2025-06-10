@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import moment from "moment";
 import axios from "axios";
 import { message } from "antd";
-
+import dayjs from 'dayjs';
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
@@ -121,9 +121,7 @@ const MainFormPage = () => {
       const demographicPayload = {
         fr_full_name: demographic.fr_full_name || "",
         fr_local_language_name: demographic.fr_local_language_name || "",
-        fr_dob: demographic.fr_dob
-          ? moment(demographic.fr_dob).format("YYYY-MM-DD")
-          : "",
+        fr_dob: demographic.fr_dob || "", 
         fr_gender: demographic.fr_gender || "",
         fr_social_category: demographic.fr_social_category || "",
         fr_email: demographic.fr_email || "",
@@ -194,13 +192,25 @@ const MainFormPage = () => {
     <div className="main-form-container">
       <TabsNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="form-content">
-        {activeTab === 1 && (
+        {/* {activeTab === 1 && (
           <DemographicForm
             ref={formRefs[1]}
             onSubmit={handleDemographicSubmit}
             initialValues={formData.demographic}
           />
-        )}
+        )} */}
+        {activeTab === 1 && (
+  <DemographicForm
+    ref={formRefs[1]}
+    onSubmit={handleDemographicSubmit}
+    initialValues={{
+      ...formData.demographic,
+      fr_dob: formData.demographic.fr_dob 
+        ? dayjs(formData.demographic.fr_dob, 'YYYY-MM-DD') 
+        : null
+    }}
+  />
+)}
         {activeTab === 2 && (
           <LandForm
             ref={formRefs[2]}
