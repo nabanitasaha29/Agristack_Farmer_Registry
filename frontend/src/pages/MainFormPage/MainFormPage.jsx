@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import moment from "moment";
 import axios from "axios";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import dayjs from 'dayjs';
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
@@ -12,6 +12,7 @@ import "./MainFormPage.css";
 
 const MainFormPage = () => {
   const [activeTab, setActiveTab] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     demographic: {},
     agricultural: {},
@@ -89,6 +90,7 @@ const MainFormPage = () => {
       };
     }
 
+    
     const totalArea = landEntries.reduce(
       (sum, land) => sum + (parseFloat(land.fr_land_area) || 0),
       0
@@ -108,15 +110,19 @@ const MainFormPage = () => {
 
   const handleFinalAction = async (action) => {
     if (action === "submit") {
-      const { demographic, land, } = formData;
+      setLoading(true);
 
+      const { demographic, land } = formData;
       let agricultural = formData.agricultural;
-      if (formRefs[3]?.current) {
-        const validated = await formRefs[3].current.validateFields();
-        agricultural = validated;
-      }
-      const locationLevels = demographic.locationLevels || {};
-      const landEntries = land.entries || [];
+
+      try {
+        if (formRefs[3]?.current) {
+          const validated = await formRefs[3].current.validateFields();
+          agricultural = validated;
+        }
+
+        const locationLevels = demographic.locationLevels || {};
+        const landEntries = land.entries || [];
 
       const demographicPayload = {
         fr_full_name: demographic.fr_full_name || "",
@@ -136,55 +142,64 @@ const MainFormPage = () => {
         fr_postal_code: demographic.fr_postal_code || "",
       };
 
-      // Dynamically map locationLevels to fr_level_X_id
-      const levelKeys = Object.keys(locationLevels);
-      levelKeys.forEach((key, index) => {
-        demographicPayload[`fr_level_${index + 1}_id`] = locationLevels[key];
-      });
+        Object.keys(locationLevels).forEach((key, index) => {
+          demographicPayload[`fr_level_${index + 1}_id`] = locationLevels[key];
+        });
 
-      const finalPayload = {
-        demographic: demographicPayload,
-        agricultural: {
-          fr_farmer_type: agricultural.fr_farmer_type || "",
-          fr_farmer_category: agricultural.fr_farmer_category || "",
-          fr_total_land_area_owned: agricultural.fr_total_land_area_owned || "",
-          fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || 0,
-        },
-        land: {
-          entries: landEntries.map((entry) => ({
-            fr_land_identifier_1: entry.fr_land_identifier_1 || "",
-            fr_land_identifier_2: entry.fr_land_identifier_2 || "",
-            fr_land_identifier_3: entry.fr_land_identifier_3 || "",
-            fr_land_area: entry.fr_land_area || 0,
-            fr_area_unit: entry.fr_area_unit || "Acre",
-            fr_level_1_id: entry.landLocation?.level_1_name || "",
-            fr_level_2_id: entry.landLocation?.level_2_name || "",
-            fr_level_3_id: entry.landLocation?.level_3_name || "",
-            fr_level_4_id: entry.landLocation?.level_4_name || "",
-            fr_level_5_id: entry.landLocation?.level_5_name || "",
-            fr_level_6_id: entry.landLocation?.level_6_name || "",
-          })),
-        },
-      };
+        const finalPayload = {
+          demographic: demographicPayload,
+          agricultural: {
+            fr_farmer_type: agricultural.fr_farmer_type || "",
+            fr_farmer_category: agricultural.fr_farmer_category || "",
+            fr_total_land_area_owned:
+              agricultural.fr_total_land_area_owned || "",
+            fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || 0,
+          },
+          land: {
+            entries: landEntries.map((entry) => ({
+              fr_land_identifier_1: entry.fr_land_identifier_1 || "",
+              fr_land_identifier_2: entry.fr_land_identifier_2 || "",
+              fr_land_identifier_3: entry.fr_land_identifier_3 || "",
+              fr_land_area: entry.fr_land_area || 0,
+              fr_area_unit: entry.fr_area_unit || "Acre",
+              fr_level_1_id: entry.landLocation?.level_1_name || "",
+              fr_level_2_id: entry.landLocation?.level_2_name || "",
+              fr_level_3_id: entry.landLocation?.level_3_name || "",
+              fr_level_4_id: entry.landLocation?.level_4_name || "",
+              fr_level_5_id: entry.landLocation?.level_5_name || "",
+              fr_level_6_id: entry.landLocation?.level_6_name || "",
+            })),
+          },
+        };
 
-      try {
-        console.log("Final Payload:", finalPayload);
-        console.log("📤 Sending demographic.locationLevels:", locationLevels);
         const response = await axios.post(
           "http://localhost:5000/api/farmer/register",
           finalPayload
         );
-        alert("Form submitted successfully!");
+
+        message.success("Form submitted successfully!");
         console.log("Server response:", response.data);
+
+        // Reset form and go to first tab
+        setFormData({
+          demographic: {},
+          agricultural: {},
+          land: { entries: [] },
+        });
+        setActiveTab(1);
       } catch (error) {
         console.error("Submit error:", error);
-        alert("Failed to submit form. Please try again.");
+        message.error("Failed to submit form. Please try again.");
+      } finally {
+        setLoading(false);
       }
     } else if (action === "draft") {
-      alert("Form saved as draft:\n" + JSON.stringify(formData, null, 2));
+      message.info("Form saved as draft.");
+      console.log("Draft data:", formData);
     } else if (action === "restart") {
       setFormData({ demographic: {}, agricultural: {}, land: { entries: [] } });
       setActiveTab(1);
+      message.success("Form restarted.");
     }
   };
 
@@ -192,12 +207,13 @@ const MainFormPage = () => {
     <div className="main-form-container">
       <TabsNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="form-content">
-        {/* {activeTab === 1 && (
-          <DemographicForm
-            ref={formRefs[1]}
-            onSubmit={handleDemographicSubmit}
-            initialValues={formData.demographic}
-          />
+        <Spin spinning={loading} tip="Submitting...">
+          {/* {activeTab === 1 && (
+            <DemographicForm
+              ref={formRefs[1]}
+              onSubmit={handleDemographicSubmit}
+              initialValues={formData.demographic}
+            />
         )} */}
         {activeTab === 1 && (
   <DemographicForm
@@ -210,33 +226,34 @@ const MainFormPage = () => {
         : null
     }}
   />
-)}
-        {activeTab === 2 && (
-          <LandForm
-            ref={formRefs[2]}
-            onSubmit={handleLandSubmit}
-            initialValues={{
-              ...formData.land,
-              lands: formData.land.entries,
-            }}
-          />
-        )}
-        {activeTab === 3 && (
-          <AgriculturalForm
-            ref={formRefs[3]}
-            onSubmit={handleAgriculturalSubmit}
-            onFinalAction={handleFinalAction}
-            initialValues={{
-              ...formData.agricultural,
-              ...calculateAgriculturalData(formData.land.entries || []),
-            }}
-            landUnit={
-              formData.land.entries?.[0]?.fr_area_unit
-                ? formData.land.entries[0].fr_area_unit
-                : "acres"
-            }
-          />
-        )}
+  )}
+          {activeTab === 2 && (
+            <LandForm
+              ref={formRefs[2]}
+              onSubmit={handleLandSubmit}
+              initialValues={{
+                ...formData.land,
+                lands: formData.land.entries,
+              }}
+            />
+          )}
+          {activeTab === 3 && (
+            <AgriculturalForm
+              ref={formRefs[3]}
+              onSubmit={handleAgriculturalSubmit}
+              onFinalAction={handleFinalAction}
+              initialValues={{
+                ...formData.agricultural,
+                ...calculateAgriculturalData(formData.land.entries || []),
+              }}
+              landUnit={
+                formData.land.entries?.[0]?.fr_area_unit
+                  ? formData.land.entries[0].fr_area_unit
+                  : "acres"
+              }
+            />
+          )}
+        </Spin>
       </div>
     </div>
   );
