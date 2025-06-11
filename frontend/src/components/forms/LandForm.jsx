@@ -123,7 +123,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
       ...values,
       landLocation: locationData,
       id: Date.now(),
-      areaUnit,
+      fr_area_unit: areaUnit,
     };
 
     console.log("New land object:", newLand);
