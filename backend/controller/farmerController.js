@@ -10,6 +10,7 @@ export const submitFarmerData = async (req, res) => {
 
     const insertFarmerQuery = `
       INSERT INTO fr_farmer_details (
+       
         fr_full_name, fr_local_language_name, fr_dob, fr_gender,
         fr_social_category, fr_email, fr_id_proof_type, fr_id_proof_number,
         fr_mobile_number, fr_address_line_1, fr_address_line_2, fr_local_language_address,
@@ -58,12 +59,14 @@ export const submitFarmerData = async (req, res) => {
       for (const entry of land.entries) {
         await client.query(
           `INSERT INTO fr_land_details (
+            fr_farmer_id,
             fr_land_identifier_1, fr_land_identifier_2, fr_land_identifier_3,
             fr_land_area, fr_area_unit,
             fr_level_1_id, fr_level_2_id, fr_level_3_id,
             fr_level_4_id, fr_level_5_id, fr_level_6_id
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
           [
+            farmerId,
             entry.fr_land_identifier_1,
             entry.fr_land_identifier_2,
             entry.fr_land_identifier_3,
