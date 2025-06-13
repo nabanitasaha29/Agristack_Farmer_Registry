@@ -5,6 +5,8 @@ import Unauthorized from '../pages/Unauthorized';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import Layout from '../components/layout/Layout';
 import FarmerDashboard from '../pages/farmer/FarmerDashboard';
+import MainFormPage from '../pages/MainFormPage/MainFormPage';
+import FarmerDetailsPage from '../pages/farmer/FarmerDetailsPage';
 // Import operator components similarly...
 
 const AppRoutes = () => {
@@ -16,9 +18,12 @@ const AppRoutes = () => {
       {/* Farmer Routes */}
       <Route element={<ProtectedRoute requiredRole="farmer" />}>
         <Route path="/farmer" element={<Layout role="farmer" />}>
-          <Route index element={<FarmerDashboard />} />
+          <Route index element={<MainFormPage />} />
           <Route path="dashboard" element={<FarmerDashboard />} />
           {/* More farmer routes */}
+          <Route path="/farmer/form" element={<MainFormPage />} />
+          <Route path="/farmer/details" element={<FarmerDetailsPage />} />
+     
         </Route>
       </Route>
 

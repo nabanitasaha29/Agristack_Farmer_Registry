@@ -7,10 +7,11 @@ import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
 import TabsNavigation from "../../components/TabsNavigation";
-
+import { useNavigate } from 'react-router-dom';
 import "./MainFormPage.css";
 
 const MainFormPage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -192,6 +193,8 @@ const MainFormPage = () => {
           land: { entries: [] },
         });
         setActiveTab(1);
+        navigate('/farmer/dashboard');
+       
       } catch (error) {
         console.error("Submit error:", error);
         message.error("Failed to submit form. Please try again.");
@@ -220,18 +223,19 @@ const MainFormPage = () => {
               initialValues={formData.demographic}
             />
         )} */}
-          {activeTab === 1 && (
-            <DemographicForm
-              ref={formRefs[1]}
-              onSubmit={handleDemographicSubmit}
-              initialValues={{
-                ...formData.demographic,
-                fr_dob: formData.demographic.fr_dob
-                  ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
-                  : null,
-              }}
-            />
-          )}
+        {activeTab === 1 && (
+  <DemographicForm
+    ref={formRefs[1]}
+    onSubmit={handleDemographicSubmit}
+    initialValues={{
+      ...formData.demographic,
+      fr_dob: formData.demographic.fr_dob 
+        ? dayjs(formData.demographic.fr_dob, 'YYYY-MM-DD') 
+        // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
+        : null
+    }}
+  />
+  )}
           {activeTab === 2 && (
             <LandForm
               ref={formRefs[2]}

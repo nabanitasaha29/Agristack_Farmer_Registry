@@ -9,6 +9,7 @@ export const nigeriaConfig = {
   mobileCode: "234",
   // tableName: "nigeria_location_lgd", // your actual Nigeria location data table
   tableName: "country_agnostik_location_master",
+  dateFormat: "DD/MM/YYYY",
   idProofTypes: [
     { value: "NIN", label: "National Identity Number (NIN)" },
     { value: "VoterCard", label: "Permanent Voter's Card" },

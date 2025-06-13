@@ -3,8 +3,12 @@ import React from 'react';
 import AppBar from './AppBar';
 import Sidebar from './Sidebar';
 import { Box } from '@mui/material';
+import { Outlet ,useLocation} from 'react-router-dom';
 
-const Layout = ({ children, role }) => {
+// const Layout = ({ children, role }) => {
+  const Layout = () => {
+  const { pathname } = useLocation();
+  const role = pathname.includes('/operator') ? 'operator' : 'farmer';
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar role={role} />
@@ -16,7 +20,8 @@ const Layout = ({ children, role }) => {
         backgroundColor: '#f9f9f9',
         minHeight: 'calc(100vh - 64px)'
       }}>
-        {children}
+        {/* {children} */}
+          <Outlet />
       </Box>
     </Box>
   );

@@ -9,6 +9,7 @@ export const indiaConfig = {
   mobileCode: "91",
   // tableName: "lgd_master",
   tableName: "country_agnostik_location_master",
+  dateFormat: "DD/MM/YYYY",
   idProofTypes: [
     { value: "Aadhaar", label: "Aadhaar Card" },
     { value: "PAN", label: "PAN Card" },

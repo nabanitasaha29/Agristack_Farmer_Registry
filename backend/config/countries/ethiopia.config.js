@@ -10,6 +10,7 @@ export const ethiopiaConfig = {
   mobileCode: "251",
   // tableName: "ethiopia_location_data",
   tableName: "country_agnostik_location_master",
+  dateFormat: "DD/MM/YYYY",
   idProofTypes: [
     { value: "KebeleID", label: "Kebele ID Card" },
     { value: "Passport", label: "Passport" },

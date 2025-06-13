@@ -109,6 +109,22 @@ router.get("/social-categories", (req, res) => {
   });
 });
 
+// New route: Date format for the active country
+router.get("/date-format", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
+
+  if (!config || !config.dateFormat) {
+    return res
+      .status(404)
+      .json({ error: "Date format not found for active country" });
+  }
+
+  res.json({
+    countryCode: activeCountry,
+    dateFormat: config.dateFormat,
+  });
+});
 
 
 

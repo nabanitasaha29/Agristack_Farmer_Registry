@@ -23,7 +23,8 @@ const AuthProvider = ({ children }) => {
       <ReactKeycloakProvider
         authClient={keycloak}
         initOptions={{
-          onLoad: 'login-required', // or 'login-required'
+          // onLoad: 'login-required', // or 'login-required'
+          onLoad: 'check-sso', 
           pkceMethod: 'S256',
           checkLoginIframe: false,
         }}

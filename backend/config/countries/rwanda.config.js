@@ -10,6 +10,7 @@ export const rwandaConfig = {
   mobileCode: "250",
   // tableName: "rwanda_location_data",
   tableName: "country_agnostik_location_master",
+  dateFormat: "DD/MM/YYYY",
   idProofTypes: [
     { value: "NID", label: "National Identification Card" },
     { value: "Passport", label: "Passport" },
