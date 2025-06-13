@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import moment from "moment";
 import axios from "axios";
 import { message, Spin } from "antd";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
@@ -90,7 +90,6 @@ const MainFormPage = () => {
       };
     }
 
-    
     const totalArea = landEntries.reduce(
       (sum, land) => sum + (parseFloat(land.fr_land_area) || 0),
       0
@@ -107,7 +106,6 @@ const MainFormPage = () => {
       fr_farmer_category: farmerCategory,
     };
   };
-
   const handleFinalAction = async (action) => {
     if (action === "submit") {
       setLoading(true);
@@ -124,31 +122,37 @@ const MainFormPage = () => {
         const locationLevels = demographic.locationLevels || {};
         const landEntries = land.entries || [];
 
-      const demographicPayload = {
-        fr_full_name: demographic.fr_full_name || "",
-        fr_local_language_name: demographic.fr_local_language_name || "",
-        fr_dob: demographic.fr_dob || "", 
-        fr_gender: demographic.fr_gender || "",
-        fr_social_category: demographic.fr_social_category || "",
-        fr_email: demographic.fr_email || "",
-        fr_id_proof_type: demographic.fr_id_proof_type || "",
-        fr_id_proof_number: demographic.fr_id_proof_number || "",
-        fr_mobile_number: demographic.fr_mobile_number
-          ? demographic.fr_mobile_number.replace(/\D/g, "")
-          : "",
-        fr_address_line_1: demographic.fr_address_line_1 || "",
-        fr_address_line_2: demographic.fr_address_line_2 || "",
-        fr_local_language_address: demographic.fr_local_language_address || "",
-        fr_postal_code: demographic.fr_postal_code || "",
-      };
+        const fr_farmer_id = demographic.fr_farmer_id;
+
+        const demographicPayload = {
+          fr_farmer_id: fr_farmer_id,
+          fr_full_name: demographic.fr_full_name || "",
+          fr_local_language_name: demographic.fr_local_language_name || "",
+          fr_dob: demographic.fr_dob || "",
+          fr_gender: demographic.fr_gender || "",
+          fr_social_category: demographic.fr_social_category || "",
+          fr_email: demographic.fr_email || "",
+          fr_id_proof_type: demographic.fr_id_proof_type || "",
+          fr_id_proof_number: demographic.fr_id_proof_number || "",
+          fr_mobile_number: demographic.fr_mobile_number
+            ? demographic.fr_mobile_number.replace(/\D/g, "")
+            : "",
+          fr_address_line_1: demographic.fr_address_line_1 || "",
+          fr_address_line_2: demographic.fr_address_line_2 || "",
+          fr_local_language_address:
+            demographic.fr_local_language_address || "",
+          fr_postal_code: demographic.fr_postal_code || "",
+        };
 
         Object.keys(locationLevels).forEach((key, index) => {
           demographicPayload[`fr_level_${index + 1}_id`] = locationLevels[key];
         });
 
+        // Final combined payload
         const finalPayload = {
           demographic: demographicPayload,
           agricultural: {
+            fr_farmer_id: fr_farmer_id,
             fr_farmer_type: agricultural.fr_farmer_type || "",
             fr_farmer_category: agricultural.fr_farmer_category || "",
             fr_total_land_area_owned:
@@ -157,6 +161,7 @@ const MainFormPage = () => {
           },
           land: {
             entries: landEntries.map((entry) => ({
+              fr_farmer_id: fr_farmer_id,
               fr_land_identifier_1: entry.fr_land_identifier_1 || "",
               fr_land_identifier_2: entry.fr_land_identifier_2 || "",
               fr_land_identifier_3: entry.fr_land_identifier_3 || "",
@@ -172,6 +177,7 @@ const MainFormPage = () => {
           },
         };
 
+        // Make a single request if your backend accepts everything together:
         const response = await axios.post(
           "http://localhost:5000/api/farmer/register",
           finalPayload
@@ -180,7 +186,6 @@ const MainFormPage = () => {
         message.success("Form submitted successfully!");
         console.log("Server response:", response.data);
 
-        // Reset form and go to first tab
         setFormData({
           demographic: {},
           agricultural: {},
@@ -215,18 +220,18 @@ const MainFormPage = () => {
               initialValues={formData.demographic}
             />
         )} */}
-        {activeTab === 1 && (
-  <DemographicForm
-    ref={formRefs[1]}
-    onSubmit={handleDemographicSubmit}
-    initialValues={{
-      ...formData.demographic,
-      fr_dob: formData.demographic.fr_dob 
-        ? dayjs(formData.demographic.fr_dob, 'YYYY-MM-DD') 
-        : null
-    }}
-  />
-  )}
+          {activeTab === 1 && (
+            <DemographicForm
+              ref={formRefs[1]}
+              onSubmit={handleDemographicSubmit}
+              initialValues={{
+                ...formData.demographic,
+                fr_dob: formData.demographic.fr_dob
+                  ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
+                  : null,
+              }}
+            />
+          )}
           {activeTab === 2 && (
             <LandForm
               ref={formRefs[2]}
