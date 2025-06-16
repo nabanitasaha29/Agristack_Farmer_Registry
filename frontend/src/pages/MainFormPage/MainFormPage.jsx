@@ -183,7 +183,7 @@ const MainFormPage = () => {
           "http://localhost:5000/api/farmer/register",
           finalPayload
         );
-
+        const farmerId = response.data.farmerId;
         message.success("Form submitted successfully!");
         console.log("Server response:", response.data);
 
@@ -193,8 +193,9 @@ const MainFormPage = () => {
           land: { entries: [] },
         });
         setActiveTab(1);
-        navigate('/farmer/dashboard');
-       
+        // navigate('/farmer/dashboard');
+        navigate(`/farmer/dashboard?farmerId=${farmerId}`);
+
       } catch (error) {
         console.error("Submit error:", error);
         message.error("Failed to submit form. Please try again.");
@@ -223,19 +224,19 @@ const MainFormPage = () => {
               initialValues={formData.demographic}
             />
         )} */}
-        {activeTab === 1 && (
-  <DemographicForm
-    ref={formRefs[1]}
-    onSubmit={handleDemographicSubmit}
-    initialValues={{
-      ...formData.demographic,
-      fr_dob: formData.demographic.fr_dob 
-        ? dayjs(formData.demographic.fr_dob, 'YYYY-MM-DD') 
-        // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-        : null
-    }}
-  />
-  )}
+          {activeTab === 1 && (
+            <DemographicForm
+              ref={formRefs[1]}
+              onSubmit={handleDemographicSubmit}
+              initialValues={{
+                ...formData.demographic,
+                fr_dob: formData.demographic.fr_dob
+                  ? dayjs(formData.demographic.fr_dob, 'YYYY-MM-DD')
+                  // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
+                  : null
+              }}
+            />
+          )}
           {activeTab === 2 && (
             <LandForm
               ref={formRefs[2]}
