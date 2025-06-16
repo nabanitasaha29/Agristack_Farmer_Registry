@@ -7,6 +7,7 @@ import Layout from '../components/layout/Layout';
 import FarmerDashboard from '../pages/farmer/FarmerDashboard';
 import MainFormPage from '../pages/MainFormPage/MainFormPage';
 import FarmerDetailsPage from '../pages/farmer/FarmerDetailsPage';
+import StatusView from '../pages/farmer/components/FarmerDetails/StatusView';
 // Import operator components similarly...
 
 const AppRoutes = () => {
@@ -23,7 +24,7 @@ const AppRoutes = () => {
           {/* More farmer routes */}
           <Route path="/farmer/form" element={<MainFormPage />} />
           <Route path="/farmer/details" element={<FarmerDetailsPage />} />
-     
+          <Route path="/farmer/registration-details" element={<StatusView />} />
         </Route>
       </Route>
 
