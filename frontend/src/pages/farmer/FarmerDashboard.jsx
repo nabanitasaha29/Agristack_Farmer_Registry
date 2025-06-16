@@ -24,9 +24,9 @@ const FarmerDashboard = () => {
   const queryParams = new URLSearchParams(location.search);
   const farmerId = queryParams.get("farmerId");
 
-  const handleRegisterNow = () => {
-    navigate('/farmer/form'); // 👉 update with your actual form route
-  };
+  // const handleRegisterNow = () => {
+  //   navigate('/farmer/form'); // 👉 update with your actual form route
+  // };
 
   const handleAlreadyRegistered = () => {
     navigate('/farmer/details'); // 👉 update with your actual details route
@@ -45,9 +45,9 @@ const FarmerDashboard = () => {
         </div>
       )}
       <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
-        <Button variant="contained" color="primary" onClick={handleRegisterNow}>
+        {/* <Button variant="contained" color="primary" onClick={handleRegisterNow}>
           Register Now
-        </Button>
+        </Button> */}
         <Button variant="outlined" color="secondary" onClick={handleAlreadyRegistered}>
           Already Registered
         </Button>

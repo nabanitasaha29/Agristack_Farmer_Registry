@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './HomePage.css'; 
+import './HomePage.css';
 import { useAuth } from '../../auth/useAuth'; // Consistent named import
 
 const HomePage = () => {
@@ -40,6 +40,15 @@ const HomePage = () => {
             <button className="login-btn farmer-btn" onClick={handleFarmerLogin}>
               Login as Farmer
             </button>
+            <div className="register-section">
+              <p className="register-text">Don't have an account?</p>
+              <button
+                className="login-btn farmer-btn"
+                onClick={() => navigate('/register')}
+              >
+                Click Here to Register
+              </button>
+            </div>
           </div>
         </div>
 

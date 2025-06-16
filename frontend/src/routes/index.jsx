@@ -15,14 +15,13 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-
+      <Route path="/register" element={<MainFormPage />} />
       {/* Farmer Routes */}
       <Route element={<ProtectedRoute requiredRole="farmer" />}>
         <Route path="/farmer" element={<Layout role="farmer" />}>
           <Route index element={<MainFormPage />} />
           <Route path="dashboard" element={<FarmerDashboard />} />
           {/* More farmer routes */}
-          <Route path="/farmer/form" element={<MainFormPage />} />
           <Route path="/farmer/details" element={<FarmerDetailsPage />} />
           <Route path="/farmer/registration-details" element={<StatusView />} />
         </Route>

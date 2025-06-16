@@ -35,8 +35,9 @@
 }
 
 .login-card {
-  width: 280px;
-  height: 220px; /* Reduced height */
+  width: 300px;
+  height: 240px;
+  /* Reduced height */
   background: white;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -122,13 +123,25 @@
   .login-options {
     flex-direction: column;
   }
-  
+
   .header h1 {
     font-size: 1.8rem;
   }
-  
+
   .login-card {
     width: 260px;
     height: 200px;
   }
+}
+
+.register-section {
+  margin-top: 1px;
+  text-align: center;
+  width: 100%;
+}
+
+.register-text {
+  font-size: 14px;
+  margin-bottom: 2px;
+  color: #444;
 }

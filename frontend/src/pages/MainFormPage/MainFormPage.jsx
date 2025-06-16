@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import moment from "moment";
 import axios from "axios";
-import { message, Spin } from "antd";
+import { message, Spin, Modal } from "antd";
 import dayjs from "dayjs";
 import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
@@ -184,7 +184,21 @@ const MainFormPage = () => {
           finalPayload
         );
         const farmerId = response.data.farmerId;
-        message.success("Form submitted successfully!");
+        // message.success("Form submitted successfully!");
+        Modal.success({
+          title: 'Registration Successful',
+          content: (
+            <div>
+              <p>You have successfully registered.</p>
+              <p>
+                Your credentials will be shared with you once your registration is approved.
+                An SMS will be sent to your registered mobile number.
+              </p>
+            </div>
+          ),
+          okText: 'Close',
+        });
+
         console.log("Server response:", response.data);
 
         setFormData({
@@ -194,7 +208,7 @@ const MainFormPage = () => {
         });
         setActiveTab(1);
         // navigate('/farmer/dashboard');
-        navigate(`/farmer/dashboard?farmerId=${farmerId}`);
+        // navigate(`/farmer/dashboard?farmerId=${farmerId}`);
 
       } catch (error) {
         console.error("Submit error:", error);
