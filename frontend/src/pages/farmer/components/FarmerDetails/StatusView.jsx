@@ -1,7 +1,64 @@
+
+
+
+// // src/components/StatusView.jsx
+// import React from "react";
+// import { useLocation } from "react-router-dom";
+// import { Table, Typography } from "antd";
+
+// const { Title } = Typography;
+
+// const StatusView = () => {
+//   const location = useLocation();
+//   const farmerData = location.state?.farmerData;
+
+//   console.log("FarmerData received in StatusView:", farmerData);
+
+//   if (!farmerData || farmerData.length === 0) {
+//     return <p>No farmer data available.</p>;
+//   }
+
+//   // Ensure farmerData is always an array
+//   const data = Array.isArray(farmerData) ? farmerData : [farmerData];
+
+//   // Dynamically generate column definitions
+//   const columns = Object.keys(data[0]).map((key) => ({
+//     title: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), // e.g. "fr_full_name" → "Fr Full Name"
+//     dataIndex: key,
+//     key: key,
+//   }));
+
+//   return (
+//     <div style={{ padding: "24px" }}>
+//       <Title level={3}>Farmer Details</Title>
+//       <Table
+//         columns={columns}
+//         dataSource={data}
+//         rowKey="fr_farmer_id" // Ensure this key exists, or change as needed
+//         bordered
+//         pagination={false}
+//         scroll={{ x: true }}
+//       />
+//     </div>
+//   );
+// };
+
+// export default StatusView;
+
+
+
+
+
+
+
+
+
+
 // src/components/StatusView.jsx
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { Table, Typography } from "antd";
+import { Table, Typography, Divider } from "antd";
+import "./StatusView.css"; // import CSS for styling
 
 const { Title } = Typography;
 
@@ -9,55 +66,64 @@ const StatusView = () => {
   const location = useLocation();
   const farmerData = location.state?.farmerData;
 
-  console.log("FarmerData received in StatusView:", farmerData);
-
-  if (!farmerData || farmerData.length === 0) {
+  if (!farmerData || (Array.isArray(farmerData) && farmerData.length === 0)) {
     return <p>No farmer data available.</p>;
   }
 
-  const columns = [
-    { title: "Farmer ID", dataIndex: "fr_farmer_id", key: "fr_farmer_id" },
-    { title: "Full Name", dataIndex: "fr_full_name", key: "fr_full_name" },
-    { title: "Gender", dataIndex: "fr_gender", key: "fr_gender" },
-    { title: "DOB", dataIndex: "fr_dob", key: "fr_dob" },
-    { title: "Mobile", dataIndex: "fr_mobile_number", key: "fr_mobile_number" },
-    { title: "Email", dataIndex: "fr_email", key: "fr_email" },
-    {
-      title: "Social Category",
-      dataIndex: "fr_social_category",
-      key: "fr_social_category",
-    },
-    {
-      title: "Farmer Type",
-      dataIndex: "fr_farmer_type",
-      key: "fr_farmer_type",
-    },
-    {
-      title: "Farmer Category",
-      dataIndex: "fr_farmer_category",
-      key: "fr_farmer_category",
-    },
-    {
-      title: "Land Area",
-      dataIndex: "fr_total_land_area_owned",
-      key: "fr_total_land_area_owned",
-    },
-    { title: "Village", dataIndex: "fr_level_5_id", key: "fr_level_5_id" },
-    { title: "Sector", dataIndex: "fr_level_3_id", key: "fr_level_3_id" },
-    { title: "Province", dataIndex: "fr_level_1_id", key: "fr_level_1_id" },
+  const data = Array.isArray(farmerData) ? farmerData[0] : farmerData;
+
+  // Group fields into categories
+  const demographicFields = [
+    "fr_full_name", "fr_local_language_name", "fr_dob", "fr_gender",
+    "fr_social_category", "fr_email", "fr_mobile_number", "fr_id_proof_type", "fr_id_proof_number",
+    "fr_address_line_1", "fr_address_line_2", "fr_local_language_address", "fr_postal_code", "fr_country"
   ];
 
-  return (
-    <div style={{ padding: "24px" }}>
-      <Title level={3}>Farmer Details</Title>
+  const agriculturalFields = [
+    "fr_farmer_type", "fr_farmer_category", "fr_total_land_area_owned",
+    "fr_no_of_lands_owned"
+  ];
+
+  const landFields = [
+    "fr_land_identifier_1", "fr_land_identifier_2", "fr_land_identifier_3",
+    "fr_land_area", "fr_area_unit", "fr_level_1_id", "fr_level_2_id", "fr_level_3_id",
+    "fr_level_4_id", "fr_level_5_id", "fr_level_6_id"
+  ];
+
+  // Utility to create table data from selected keys
+  const createSectionData = (keys) =>
+    keys
+      .filter((key) => data[key] !== undefined)
+      .map((key, index) => ({
+        key: index,
+        field: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        value: data[key] ?? "—",
+      }));
+
+  const renderSection = (title, keys) => (
+    <>
+      <Divider orientation="left">
+        <Title level={4} className="section-title">{title}</Title>
+      </Divider>
       <Table
-        columns={columns}
-        dataSource={Array.isArray(farmerData) ? farmerData : [farmerData]}
-        rowKey="fr_farmer_id"
-        bordered
+        columns={[
+          { title: "Field", dataIndex: "field", key: "field" },
+          { title: "Value", dataIndex: "value", key: "value" },
+        ]}
+        dataSource={createSectionData(keys)}
         pagination={false}
-        scroll={{ x: true }}
+        bordered
+        className="section-table"
       />
+    </>
+  );
+
+  return (
+    <div className="status-view-container">
+      <Title level={3} className="main-title">Farmer Details Overview</Title>
+      {renderSection("Demographic Details", demographicFields)}
+      {renderSection("Agricultural Details", agriculturalFields)}
+      {renderSection("Land Details", landFields)}
     </div>
   );
 };

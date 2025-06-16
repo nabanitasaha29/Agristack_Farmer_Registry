@@ -1,0 +1,21 @@
+.status-view-container {
+  padding: 24px;
+  background-color: #f9f9f9;
+}
+
+.main-title {
+  margin-bottom: 20px;
+  color: #003a8c;
+  text-align: center;
+}
+
+.section-title {
+  color: #0050b3;
+}
+
+.section-table {
+  margin-bottom: 40px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
