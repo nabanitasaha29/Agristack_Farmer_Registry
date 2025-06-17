@@ -1,14 +1,10 @@
-import db from "../config/db.js"; // ✅ Now valid
+import db from "../config/db.js";
 
 export const submitFarmerData = async (req, res) => {
-
-  
-
   const { demographic, agricultural, land } = req.body;
 
-    if (req.body.created_by && req.body.created_by !== createdBy) {
-    return res.status(403).json({ message: "❌ Unauthorized: created_by mismatch" });
-  }
+  const createdBy =
+    demographic?.created_by?.trim() !== "" ? demographic.created_by : "system";
 
   const client = await db.connect();
 
@@ -17,17 +13,20 @@ export const submitFarmerData = async (req, res) => {
 
     const insertFarmerQuery = `
       INSERT INTO fr_farmer_details (
-       
         fr_full_name, fr_local_language_name, fr_dob, fr_gender,
         fr_social_category, fr_email, fr_id_proof_type, fr_id_proof_number,
         fr_mobile_number, fr_address_line_1, fr_address_line_2, fr_local_language_address,
         fr_postal_code, fr_country,
         fr_level_1_id, fr_level_2_id, fr_level_3_id, fr_level_4_id,
         fr_level_5_id, fr_level_6_id,
-        fr_farmer_type, fr_farmer_category, fr_total_land_area_owned, fr_no_of_lands_owned
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
-                $11,$12,$13,$14,$15,$16,$17,$18,
-                $19,$20,$21,$22,$23,$24)
+        fr_farmer_type, fr_farmer_category, fr_total_land_area_owned, fr_no_of_lands_owned,
+        created_by, created_at, modified_by, modified_at, reg_status
+      ) VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+        $11,$12,$13,$14,$15,$16,$17,$18,
+        $19,$20,$21,$22,$23,$24,$25,$26,
+        $27,$28,$29
+      )
       RETURNING fr_farmer_id
     `;
 
@@ -45,7 +44,6 @@ export const submitFarmerData = async (req, res) => {
       demographic.fr_address_line_2,
       demographic.fr_local_language_address,
       demographic.fr_postal_code,
-      // demographic.fr_country || "India",
       process.env.ACTIVE_COUNTRY || "IN",
       demographic.fr_level_1_id,
       demographic.fr_level_2_id,
@@ -57,7 +55,11 @@ export const submitFarmerData = async (req, res) => {
       agricultural.fr_farmer_category,
       agricultural.fr_total_land_area_owned,
       agricultural.fr_no_of_lands_owned,
-      
+      createdBy,
+      new Date(), // created_at
+      null, // modified_by
+      null, // modified_at
+      null, // reg_status
     ];
 
     const farmerResult = await client.query(insertFarmerQuery, values);
@@ -86,22 +88,18 @@ export const submitFarmerData = async (req, res) => {
             entry.fr_level_4_id,
             entry.fr_level_5_id,
             entry.fr_level_6_id,
-            
           ]
         );
       }
     }
 
     await client.query("COMMIT");
-
-    res.status(200).json({ message: "✅ Farmer registered", farmerId });
+    res.status(200).json({ message: " Farmer registered", farmerId });
   } catch (err) {
     await client.query("ROLLBACK");
-    console.error("❌ Error submitting farmer:", err.message);
-    res.status(500).json({ message: "❌ Server error", error: err.message });
+    console.error(" Error submitting farmer:", err.message);
+    res.status(500).json({ message: " Server error", error: err.message });
   } finally {
     client.release();
   }
 };
-
-
