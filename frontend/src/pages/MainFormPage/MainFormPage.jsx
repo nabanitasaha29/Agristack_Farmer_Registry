@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import moment from "moment";
+import React, { useState, useRef, useEffect } from "react";
+//import moment from "moment";
 import axios from "axios";
 import { message, Spin, Modal } from "antd";
 import dayjs from "dayjs";
@@ -7,14 +7,20 @@ import DemographicForm from "../../components/forms/DemographicForm";
 import AgriculturalForm from "../../components/forms/AgriculturalForm";
 import LandForm from "../../components/forms/LandForm";
 import TabsNavigation from "../../components/TabsNavigation";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
 import "./MainFormPage.css";
 
-
 const MainFormPage = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(false);
+  const { username } = useAuth();
+  console.log("Current logged-in username:", username);
+
+  useEffect(() => {
+    console.log("Auth loaded, username:", username);
+  }, [username]);
   const [formData, setFormData] = useState({
     demographic: {},
     agricultural: {},
@@ -109,7 +115,6 @@ const MainFormPage = () => {
     };
   };
 
-
   const handleFinalAction = async (action) => {
     if (action === "submit") {
       setLoading(true);
@@ -146,6 +151,12 @@ const MainFormPage = () => {
           fr_local_language_address:
             demographic.fr_local_language_address || "",
           fr_postal_code: demographic.fr_postal_code || "",
+
+          created_by: username ?? "system",
+          created_at: new Date().toISOString(),
+          modified_by: null,
+          modified_at: null,
+          reg_status: null,
         };
 
         Object.keys(locationLevels).forEach((key, index) => {
@@ -155,7 +166,7 @@ const MainFormPage = () => {
         // Final combined payload
         const finalPayload = {
           demographic: demographicPayload,
-          
+
           agricultural: {
             fr_farmer_id: fr_farmer_id,
             fr_farmer_type: agricultural.fr_farmer_type || "",
@@ -163,7 +174,6 @@ const MainFormPage = () => {
             fr_total_land_area_owned:
               agricultural.fr_total_land_area_owned || "",
             fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || 0,
-            
           },
           land: {
             entries: landEntries.map((entry) => ({
@@ -179,11 +189,8 @@ const MainFormPage = () => {
               fr_level_4_id: entry.landLocation?.level_4_name || "",
               fr_level_5_id: entry.landLocation?.level_5_name || "",
               fr_level_6_id: entry.landLocation?.level_6_name || "",
-              
             })),
           },
-
-          
         };
 
         // Make a single request if your backend accepts everything together:
@@ -191,20 +198,23 @@ const MainFormPage = () => {
           "http://localhost:5000/api/farmer/register",
           finalPayload
         );
-        const farmerId = response.data.farmerId;
+        //const farmerId = response.data.farmerId;
+        console.log("Final Payload:", finalPayload);
+
         // message.success("Form submitted successfully!");
         Modal.success({
-          title: 'Registration Successful',
+          title: "Registration Successful",
           content: (
             <div>
               <p>You have successfully registered.</p>
               <p>
-                Your credentials will be shared with you once your registration is approved.
-                An SMS will be sent to your registered mobile number.
+                Your credentials will be shared with you once your registration
+                is approved. An SMS will be sent to your registered mobile
+                number.
               </p>
             </div>
           ),
-          okText: 'Close',
+          okText: "Close",
         });
 
         console.log("Server response:", response.data);
@@ -215,9 +225,6 @@ const MainFormPage = () => {
           land: { entries: [] },
         });
         setActiveTab(1);
-        // navigate('/farmer/dashboard');
-        // navigate(`/farmer/dashboard?farmerId=${farmerId}`);
-
       } catch (error) {
         console.error("Submit error:", error);
         message.error("Failed to submit form. Please try again.");
@@ -234,23 +241,11 @@ const MainFormPage = () => {
     }
   };
 
-  
-  
- 
-  
-  
   return (
     <div className="main-form-container">
       <TabsNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="form-content">
         <Spin spinning={loading} tip="Submitting...">
-          {/* {activeTab === 1 && (
-            <DemographicForm
-              ref={formRefs[1]}
-              onSubmit={handleDemographicSubmit}
-              initialValues={formData.demographic}
-            />
-        )} */}
           {activeTab === 1 && (
             <DemographicForm
               ref={formRefs[1]}
@@ -258,9 +253,9 @@ const MainFormPage = () => {
               initialValues={{
                 ...formData.demographic,
                 fr_dob: formData.demographic.fr_dob
-                  ? dayjs(formData.demographic.fr_dob, 'YYYY-MM-DD')
-                  // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-                  : null
+                  ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
+                  : // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
+                    null,
               }}
             />
           )}

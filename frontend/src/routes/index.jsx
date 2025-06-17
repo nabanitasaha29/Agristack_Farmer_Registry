@@ -1,17 +1,16 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import HomePage from '../pages/HomePage/HomePage';
-import Unauthorized from '../pages/Unauthorized';
-import ProtectedRoute from '../components/common/ProtectedRoute';
-import Layout from '../components/layout/Layout';
-import FarmerDashboard from '../pages/farmer/FarmerDashboard';
-import MainFormPage from '../pages/MainFormPage/MainFormPage';
-import FarmerDetailsPage from '../pages/farmer/FarmerDetailsPage';
-import StatusView from '../pages/farmer/components/FarmerDetails/StatusView';
-import OperatorDashboard from '../pages/operator/OperatorDashboard';
-import RegisteredFarmers from '../pages/operator/components/RegisteredFarmers';
-import FarmerDetails from '../pages/operator/components/FarmerDetails';
-
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import HomePage from "../pages/HomePage/HomePage";
+import Unauthorized from "../pages/Unauthorized";
+import ProtectedRoute from "../components/common/ProtectedRoute";
+import Layout from "../components/layout/Layout";
+import FarmerDashboard from "../pages/farmer/FarmerDashboard";
+import MainFormPage from "../pages/MainFormPage/MainFormPage";
+import FarmerDetailsPage from "../pages/farmer/FarmerDetailsPage";
+import StatusView from "../pages/farmer/components/FarmerDetails/StatusView";
+import OperatorDashboard from "../pages/operator/OperatorDashboard";
+import RegisteredFarmers from "../pages/operator/components/RegisteredFarmers";
+import FarmerDetails from "../pages/operator/components/FarmerDetails";
 
 const AppRoutes = () => {
   return (
@@ -19,8 +18,6 @@ const AppRoutes = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/register" element={<MainFormPage />} />
-
-
 
       {/* Farmer Routes */}
       <Route element={<ProtectedRoute requiredRole="farmer" />}>
@@ -32,15 +29,12 @@ const AppRoutes = () => {
         </Route>
       </Route>
 
-
-
-
       {/* Operator Routes */}
       <Route element={<ProtectedRoute requiredRole="operator" />}>
         <Route path="/operator" element={<Layout role="operator" />}>
-          <Route path="dashboard" element={<OperatorDashboard/>} />
+          <Route path="dashboard" element={<OperatorDashboard />} />
           <Route path="registered-farmers" element={<RegisteredFarmers />} />
-          <Route path="farmer-details/:farmerId" element={<FarmerDetails />} />   
+          <Route path="farmer-details/:farmerId" element={<FarmerDetails />} />
         </Route>
       </Route>
     </Routes>
