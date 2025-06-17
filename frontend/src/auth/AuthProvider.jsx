@@ -8,15 +8,31 @@ import ErrorBoundary from './ErrorBoundary';
 const AuthProvider = ({ children }) => {
   const keycloak = getKeycloak();
 
-  const handleOnEvent = (event, error) => {
-    if (event === 'onAuthError') {
-      console.error('Authentication error:', error);
-    }
+  // const handleOnEvent = (event, error) => {
+  //   if (event === 'onAuthError') {
+  //     console.error('Authentication error:', error);
+  //   }
 
-    if (event === 'onTokenExpired') {
-      keycloak.updateToken(30).catch((e) => console.error('Token refresh error:', e));
-    }
-  };
+  //   if (event === 'onTokenExpired') {
+  //     keycloak.updateToken(30).catch((e) => console.error('Token refresh error:', e));
+  //   }
+  // };
+
+
+  // In your AuthProvider.jsx
+const handleOnEvent = (event, error) => {
+  if (event === 'onAuthError') {
+    console.error('Authentication error:', error);
+  }
+
+  if (event === 'onTokenExpired') {
+    keycloak.updateToken(30).catch((e) => {
+      console.error('Token refresh error:', e);
+      keycloak.login(); // Force re-authentication if refresh fails
+    });
+  }
+};
+
 
   return (
     <ErrorBoundary>

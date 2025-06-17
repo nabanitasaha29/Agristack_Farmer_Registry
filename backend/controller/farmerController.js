@@ -1,7 +1,14 @@
 import db from "../config/db.js"; // ✅ Now valid
 
 export const submitFarmerData = async (req, res) => {
+
+  
+
   const { demographic, agricultural, land } = req.body;
+
+    if (req.body.created_by && req.body.created_by !== createdBy) {
+    return res.status(403).json({ message: "❌ Unauthorized: created_by mismatch" });
+  }
 
   const client = await db.connect();
 
@@ -50,6 +57,7 @@ export const submitFarmerData = async (req, res) => {
       agricultural.fr_farmer_category,
       agricultural.fr_total_land_area_owned,
       agricultural.fr_no_of_lands_owned,
+      
     ];
 
     const farmerResult = await client.query(insertFarmerQuery, values);
@@ -78,6 +86,7 @@ export const submitFarmerData = async (req, res) => {
             entry.fr_level_4_id,
             entry.fr_level_5_id,
             entry.fr_level_6_id,
+            
           ]
         );
       }
@@ -94,3 +103,5 @@ export const submitFarmerData = async (req, res) => {
     client.release();
   }
 };
+
+

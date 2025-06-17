@@ -8,7 +8,10 @@ import FarmerDashboard from '../pages/farmer/FarmerDashboard';
 import MainFormPage from '../pages/MainFormPage/MainFormPage';
 import FarmerDetailsPage from '../pages/farmer/FarmerDetailsPage';
 import StatusView from '../pages/farmer/components/FarmerDetails/StatusView';
-// Import operator components similarly...
+import OperatorDashboard from '../pages/operator/OperatorDashboard';
+import RegisteredFarmers from '../pages/operator/components/RegisteredFarmers';
+import FarmerDetails from '../pages/operator/components/FarmerDetails';
+
 
 const AppRoutes = () => {
   return (
@@ -16,21 +19,28 @@ const AppRoutes = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/register" element={<MainFormPage />} />
+
+
+
       {/* Farmer Routes */}
       <Route element={<ProtectedRoute requiredRole="farmer" />}>
         <Route path="/farmer" element={<Layout role="farmer" />}>
           <Route index element={<MainFormPage />} />
           <Route path="dashboard" element={<FarmerDashboard />} />
-          {/* More farmer routes */}
           <Route path="/farmer/details" element={<FarmerDetailsPage />} />
           <Route path="/farmer/registration-details" element={<StatusView />} />
         </Route>
       </Route>
 
-      {/* Operator Routes (similar structure) */}
+
+
+
+      {/* Operator Routes */}
       <Route element={<ProtectedRoute requiredRole="operator" />}>
         <Route path="/operator" element={<Layout role="operator" />}>
-          <Route path="dashboard" element={<div>Operator Dashboard</div>} />
+          <Route path="dashboard" element={<OperatorDashboard/>} />
+          <Route path="registered-farmers" element={<RegisteredFarmers />} />
+          <Route path="farmer-details/:farmerId" element={<FarmerDetails />} />   
         </Route>
       </Route>
     </Routes>

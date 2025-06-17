@@ -10,6 +10,7 @@ import TabsNavigation from "../../components/TabsNavigation";
 import { useNavigate } from 'react-router-dom';
 import "./MainFormPage.css";
 
+
 const MainFormPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(1);
@@ -107,6 +108,8 @@ const MainFormPage = () => {
       fr_farmer_category: farmerCategory,
     };
   };
+
+
   const handleFinalAction = async (action) => {
     if (action === "submit") {
       setLoading(true);
@@ -152,6 +155,7 @@ const MainFormPage = () => {
         // Final combined payload
         const finalPayload = {
           demographic: demographicPayload,
+          
           agricultural: {
             fr_farmer_id: fr_farmer_id,
             fr_farmer_type: agricultural.fr_farmer_type || "",
@@ -159,6 +163,7 @@ const MainFormPage = () => {
             fr_total_land_area_owned:
               agricultural.fr_total_land_area_owned || "",
             fr_no_of_lands_owned: agricultural.fr_no_of_lands_owned || 0,
+            
           },
           land: {
             entries: landEntries.map((entry) => ({
@@ -174,8 +179,11 @@ const MainFormPage = () => {
               fr_level_4_id: entry.landLocation?.level_4_name || "",
               fr_level_5_id: entry.landLocation?.level_5_name || "",
               fr_level_6_id: entry.landLocation?.level_6_name || "",
+              
             })),
           },
+
+          
         };
 
         // Make a single request if your backend accepts everything together:
@@ -226,6 +234,11 @@ const MainFormPage = () => {
     }
   };
 
+  
+  
+ 
+  
+  
   return (
     <div className="main-form-container">
       <TabsNavigation activeTab={activeTab} onTabChange={handleTabChange} />

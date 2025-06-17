@@ -16,7 +16,7 @@ const Sidebar = ({ role }) => {
   
   const operatorItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/operator/dashboard' },
-    { text: 'Settings', icon: <SettingsIcon />, path: '/operator/settings' },
+    
     // Add more operator-specific items
   ];
   
