@@ -36,7 +36,7 @@ const HomePage = () => {
             <div className="icon">
               <i className="fas fa-tractor"></i>
             </div>
-            <h2>Farmer Login</h2>
+            <h2>Farmer </h2>
             <button className="login-btn farmer-btn" onClick={handleFarmerLogin}>
               Login as Farmer
             </button>
@@ -57,7 +57,7 @@ const HomePage = () => {
             <div className="icon">
               <i className="fas fa-user-cog"></i>
             </div>
-            <h2>Operator Login</h2>
+            <h2>Operator </h2>
             <button className="login-btn operator-btn" onClick={handleOperatorLogin}>
               Login as Operator
             </button>

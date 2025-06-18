@@ -1,0 +1,56 @@
+/* FarmerDashboard.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+ 
+}
+
+.dashboard-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin: 0;
+  padding: 0;
+ 
+  z-index: 1;
+}
+
+.welcome-paper {
+  width: calc(100% - 240px - 4rem); /* Reduced width with padding */
+  height: calc(100vh - 64px - 4rem); /* Reduced height with padding */
+  margin-left: 240px;
+  margin-top: 64px;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.85); /* Slightly more transparent */
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  box-shadow: none;
+  border-radius: 16px; /* Added subtle rounded corners */
+}
+
+@media (max-width: 900px) {
+  .welcome-paper {
+    width: calc(100% - 2rem);
+    height: calc(100vh - 64px - 2rem);
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 64px;
+    padding: 1.5rem;
+  }
+}

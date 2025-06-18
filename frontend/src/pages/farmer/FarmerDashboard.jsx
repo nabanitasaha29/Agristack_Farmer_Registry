@@ -1,47 +1,67 @@
-
 import React from 'react';
-import { Button, Box, Typography } from '@mui/material';
+import { Button, Typography, Paper, Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { message } from 'antd';
-import { useLocation } from "react-router-dom";
+import { useAuth } from '../../auth/useAuth';
+import './FarmerDashboard.css';
 
 const FarmerDashboard = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { username } = useAuth();
 
-  // Parse query string
-  const queryParams = new URLSearchParams(location.search);
-  const farmerId = queryParams.get("farmerId");
-
-  // const handleRegisterNow = () => {
-  //   navigate('/farmer/form'); // 👉 update with your actual form route
-  // };
-
-  const handleAlreadyRegistered = () => {
-    navigate('/farmer/details'); // 👉 update with your actual details route
+  const handleViewDetails = () => {
+    navigate('/farmer/registration-detail');
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Farmer Dashboard
-      </Typography>
-      {farmerId && (
-        <div className="bg-green-100 text-green-800 p-4 rounded shadow-md mb-4">
-          ✅ You have been successfully registered. <br />
-          Your <strong>Registration ID</strong> is:{" "}
-          <span className="font-mono">{farmerId}</span>
-        </div>
-      )}
-      <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
-        {/* <Button variant="contained" color="primary" onClick={handleRegisterNow}>
-          Register Now
-        </Button> */}
-        <Button variant="outlined" color="secondary" onClick={handleAlreadyRegistered}>
-          Already Registered
+    <Container 
+      maxWidth={false} 
+      disableGutters 
+      className="dashboard-container"
+    >
+      <Paper className="welcome-paper">
+        <Typography 
+          variant="h2" 
+          component="h1" 
+          sx={{ 
+            fontWeight: 700,
+            color: 'primary.main',
+            mb: 4,
+            fontSize: { xs: '2.5rem', md: '3.5rem' }
+          }}
+        >
+          Welcome !
+        </Typography>
+        
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            mb: 6,
+            fontWeight: 500,
+            color: 'text.secondary',
+            fontSize: { xs: '1.5rem', md: '2rem' }
+          }}
+        >
+          Your registration is complete
+        </Typography>
+        
+        <Button 
+          variant="contained" 
+          size="large"
+          onClick={handleViewDetails}
+          sx={{
+            px: 8,
+            py: 2,
+            fontSize: '1.2rem',
+            borderRadius: 2,
+            fontWeight: 600,
+            minWidth: 300,
+            height: 60
+          }}
+        >
+          View Your Details
         </Button>
-      </Box>
-    </Box>
+      </Paper>
+    </Container>
   );
 };
 

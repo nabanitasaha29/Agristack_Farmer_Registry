@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Import icons from your preferred icon library
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import SettingsIcon from '@mui/icons-material/Settings';
+
 
 const Sidebar = ({ role }) => {
   const navigate = useNavigate();

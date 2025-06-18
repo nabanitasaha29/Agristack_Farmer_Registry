@@ -11,6 +11,8 @@ import StatusView from "../pages/farmer/components/FarmerDetails/StatusView";
 import OperatorDashboard from "../pages/operator/OperatorDashboard";
 import RegisteredFarmers from "../pages/operator/components/RegisteredFarmers";
 import FarmerDetails from "../pages/operator/components/FarmerDetails";
+import RegistrationDetails from "../pages/farmer/components/RegistrationDetails";
+
 
 const AppRoutes = () => {
   return (
@@ -26,6 +28,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<FarmerDashboard />} />
           <Route path="/farmer/details" element={<FarmerDetailsPage />} />
           <Route path="/farmer/registration-details" element={<StatusView />} />
+          <Route path="/farmer/registration-detail" element={<RegistrationDetails />} />
         </Route>
       </Route>
 

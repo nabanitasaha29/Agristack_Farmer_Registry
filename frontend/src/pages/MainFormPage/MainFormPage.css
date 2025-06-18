@@ -6,6 +6,8 @@
     background-color: #fff;/* Optional: form background */
     border-radius: 10px;   /* Optional: rounded corners */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: subtle shadow */
+    overflow-y: auto;       /* enables vertical scrolling */
+    max-height: 100vh;      /* keeps container within viewport height */
 }
 
 .tabs-button button {
