@@ -14,6 +14,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   const roles = keycloak?.tokenParsed?.realm_access?.roles || [];
+  console.log("Decoded Roles:", roles);
 
   if (requiredRole && !roles.includes(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;

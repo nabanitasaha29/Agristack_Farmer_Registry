@@ -1,10 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/useAuth';
 import { Button, Typography, Box } from '@mui/material';
 
 const Unauthorized = () => {
-  const navigate = useNavigate();
-  
+  const { logout } = useAuth();
   return (
     <Box sx={{ textAlign: 'center', mt: 10 }}>
       <Typography variant="h4" gutterBottom>
@@ -13,9 +12,9 @@ const Unauthorized = () => {
       <Typography variant="body1" sx={{ mb: 3 }}>
         You don't have permission to access this page.
       </Typography>
-      <Button 
-        variant="contained" 
-        onClick={() => navigate('/')}
+      <Button
+        variant="contained"
+        onClick={logout}// even after being unauthorized the user was authenticated due to correct credentials so we need to logout
       >
         Return to Home
       </Button>

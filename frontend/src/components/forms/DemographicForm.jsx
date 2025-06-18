@@ -76,7 +76,7 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   useEffect(() => {
     const fetchCountryAndMobileCode = async () => {
       try {
-        const [countryRes, mobileRes, idProofRes, socialCategoryRes,dateFormatRes] =
+        const [countryRes, mobileRes, idProofRes, socialCategoryRes, dateFormatRes] =
           await Promise.all([
             fetch("http://localhost:5000/api/location/active-country"),
             fetch("http://localhost:5000/api/location/mobile-code"),
@@ -117,6 +117,8 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
 
   const handleFinish = (values) => {
     const fullNumber = `+${mobileCode}${values.fr_mobile_number}`;
+    const rawDob = values.fr_dob;
+    const formattedPassword = dayjs(rawDob).format(dateFormat.replace(/\W/g, ""));
     const formattedDob = values.fr_dob
       ? dayjs(values.fr_dob).format('YYYY-MM-DD')
       // ? dayjs(values.fr_dob).format(dateFormat)
@@ -126,7 +128,8 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       fr_mobile_number: fullNumber,
       fr_dob: formattedDob,
       locationLevels: selectedLocation,
-      // dateFormatUsed: dateFormat,
+      user_raw_Dob: formattedPassword,
+      dateFormatUsed: dateFormat,
     });
   };
 
