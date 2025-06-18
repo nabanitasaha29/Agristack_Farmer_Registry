@@ -24,10 +24,12 @@ export const useAuth = () => {
   const roles = keycloak?.tokenParsed?.realm_access?.roles || [];
   const username = keycloak?.tokenParsed?.preferred_username || keycloak?.tokenParsed?.name || "User";
 
+  const role = roles.length === 1 ? roles[0] : roles.find(r => ['operator', 'admin', 'user'].includes(r)) || null;
   return {
     initialized,
     isAuthenticated,
     roles,
+    role,
     username,  // Add this line
     userInfo: keycloak?.tokenParsed,  // Add this for full user info
     login,

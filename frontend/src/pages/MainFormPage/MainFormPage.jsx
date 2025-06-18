@@ -12,7 +12,8 @@ import { useAuth } from "../../auth/useAuth";
 import "./MainFormPage.css";
 
 const MainFormPage = () => {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { role } = useAuth();
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(false);
   const { username } = useAuth();
@@ -210,6 +211,7 @@ const MainFormPage = () => {
           role_name: "farmer",
           username: farmerId.toString(),
           enabled: true,
+          requiredActions: ["UPDATE_PASSWORD"],
           credentials: [
             {
               type: "password",
@@ -259,6 +261,12 @@ const MainFormPage = () => {
                 land: { entries: [] },
               });
               setActiveTab(1);
+              console.log("Role", role);
+              if (role === "operator") {
+                navigate("/operator/dashboard");
+              } else {
+                navigate("/");
+              }
             }
           });
         } catch (keycloakError) {
