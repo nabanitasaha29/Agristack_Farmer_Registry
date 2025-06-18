@@ -267,11 +267,11 @@ const RegisteredFarmers = () => {
 
   return (
     <div className="registered-farmers-container">
-      <div className="header-section">
-        <h2 className="page-title">Registered Farmers</h2>
-        <div className="controls-section">
-          <div className="search-box">
-            <svg className="search-icon" viewBox="0 0 24 24">
+      <div className="registered-farmers-header-section">
+        <h2 className="registered-farmers-page-title">Registered Farmers</h2>
+        <div className="registered-farmers-controls-section">
+          <div className="registered-farmers-search-box">
+            <svg className="registered-farmers-search-icon" viewBox="0 0 24 24">
               <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
             </svg>
             <input
@@ -282,15 +282,15 @@ const RegisteredFarmers = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="search-input"
+              className="registered-farmers-search-input"
             />
           </div>
         </div>
       </div>
 
-      <div className="table-card">
-        <div className="table-responsive">
-          <table className="farmers-table">
+      <div className="registered-farmers-table-card">
+        <div className="registered-farmers-table-responsive">
+          <table className="registered-farmers-table">
             <thead>
               <tr>
                 <th>Farmer ID</th>
@@ -306,7 +306,7 @@ const RegisteredFarmers = () => {
                   <tr 
                     key={farmer.fr_farmer_id}
                     onClick={() => handleRowClick(farmer.fr_farmer_id)}
-                    className="clickable-row"
+                    className="registered-farmers-clickable-row"
                   >
                     <td data-label="Farmer ID">{farmer.fr_farmer_id}</td>
                     <td data-label="Full Name">{farmer.fr_full_name}</td>
@@ -316,10 +316,10 @@ const RegisteredFarmers = () => {
                   </tr>
                 ))
               ) : (
-                <tr className="no-data-row">
+                <tr className="registered-farmers-no-data-row">
                   <td colSpan="5">
-                    <div className="no-data-message">
-                      <svg className="empty-icon" viewBox="0 0 24 24">
+                    <div className="registered-farmers-no-data-message">
+                      <svg className="registered-farmers-empty-icon" viewBox="0 0 24 24">
                         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
                         <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
                       </svg>
@@ -334,29 +334,29 @@ const RegisteredFarmers = () => {
       </div>
 
       {filteredFarmers.length > farmersPerPage && (
-        <div className="pagination-container">
+        <div className="registered-farmers-pagination-container">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="pagination-button"
+            className="registered-farmers-pagination-button"
           >
-            <svg className="pagination-icon" viewBox="0 0 24 24">
+            <svg className="registered-farmers-pagination-icon" viewBox="0 0 24 24">
               <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
             </svg>
             Previous
           </button>
           
-          <div className="page-indicator">
-            Page <span className="current-page">{currentPage}</span> of <span className="total-pages">{totalPages}</span>
+          <div className="registered-farmers-page-indicator">
+            Page <span className="registered-farmers-current-page">{currentPage}</span> of <span className="registered-farmers-total-pages">{totalPages}</span>
           </div>
           
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="pagination-button"
+            className="registered-farmers-pagination-button"
           >
             Next
-            <svg className="pagination-icon" viewBox="0 0 24 24">
+            <svg className="registered-farmers-pagination-icon" viewBox="0 0 24 24">
               <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
             </svg>
           </button>

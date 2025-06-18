@@ -184,6 +184,7 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
                 },
               },
             ]}
+            required
           >
             <DatePicker
               format={dateFormat}
@@ -253,6 +254,7 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
                 },
               },
             ]}
+            required
           >
             <Input
               addonBefore={"+" + (mobileCode || "__")}
