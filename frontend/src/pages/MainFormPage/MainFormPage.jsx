@@ -153,7 +153,9 @@ const MainFormPage = () => {
             demographic.fr_local_language_address || "",
           fr_postal_code: demographic.fr_postal_code || "",
 
-          created_by: username ?? "system",
+          // created_by: username ?? "system",
+          created_by: username && username !== 'User' ? username : demographic.fr_full_name || "system",
+
           created_at: new Date().toISOString(),
           modified_by: null,
           modified_at: null,
