@@ -1,59 +1,3 @@
-
-
-
-// // src/components/StatusView.jsx
-// import React from "react";
-// import { useLocation } from "react-router-dom";
-// import { Table, Typography } from "antd";
-
-// const { Title } = Typography;
-
-// const StatusView = () => {
-//   const location = useLocation();
-//   const farmerData = location.state?.farmerData;
-
-//   console.log("FarmerData received in StatusView:", farmerData);
-
-//   if (!farmerData || farmerData.length === 0) {
-//     return <p>No farmer data available.</p>;
-//   }
-
-//   // Ensure farmerData is always an array
-//   const data = Array.isArray(farmerData) ? farmerData : [farmerData];
-
-//   // Dynamically generate column definitions
-//   const columns = Object.keys(data[0]).map((key) => ({
-//     title: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), // e.g. "fr_full_name" → "Fr Full Name"
-//     dataIndex: key,
-//     key: key,
-//   }));
-
-//   return (
-//     <div style={{ padding: "24px" }}>
-//       <Title level={3}>Farmer Details</Title>
-//       <Table
-//         columns={columns}
-//         dataSource={data}
-//         rowKey="fr_farmer_id" // Ensure this key exists, or change as needed
-//         bordered
-//         pagination={false}
-//         scroll={{ x: true }}
-//       />
-//     </div>
-//   );
-// };
-
-// export default StatusView;
-
-
-
-
-
-
-
-
-
-
 // src/components/StatusView.jsx
 import React from "react";
 import { useLocation } from "react-router-dom";
@@ -74,20 +18,41 @@ const StatusView = () => {
 
   // Group fields into categories
   const demographicFields = [
-    "fr_full_name", "fr_local_language_name", "fr_dob", "fr_gender",
-    "fr_social_category", "fr_email", "fr_mobile_number", "fr_id_proof_type", "fr_id_proof_number",
-    "fr_address_line_1", "fr_address_line_2", "fr_local_language_address", "fr_postal_code", "fr_country"
+    "fr_full_name",
+    "fr_local_language_name",
+    "fr_dob",
+    "fr_gender",
+    "fr_social_category",
+    "fr_email",
+    "fr_mobile_number",
+    "fr_id_proof_type",
+    "fr_id_proof_number",
+    "fr_address_line_1",
+    "fr_address_line_2",
+    "fr_local_language_address",
+    "fr_postal_code",
+    "fr_country",
   ];
 
   const agriculturalFields = [
-    "fr_farmer_type", "fr_farmer_category", "fr_total_land_area_owned",
-    "fr_no_of_lands_owned"
+    "fr_farmer_type",
+    "fr_farmer_category",
+    "fr_total_land_area_owned",
+    "fr_no_of_lands_owned",
   ];
 
   const landFields = [
-    "fr_land_identifier_1", "fr_land_identifier_2", "fr_land_identifier_3",
-    "fr_land_area", "fr_area_unit", "fr_level_1_id", "fr_level_2_id", "fr_level_3_id",
-    "fr_level_4_id", "fr_level_5_id", "fr_level_6_id"
+    "fr_land_identifier_1",
+    "fr_land_identifier_2",
+    "fr_land_identifier_3",
+    "fr_land_area",
+    "fr_area_unit",
+    "fr_level_1_id",
+    "fr_level_2_id",
+    "fr_level_3_id",
+    "fr_level_4_id",
+    "fr_level_5_id",
+    "fr_level_6_id",
   ];
 
   // Utility to create table data from selected keys
@@ -103,7 +68,9 @@ const StatusView = () => {
   const renderSection = (title, keys) => (
     <>
       <Divider orientation="left">
-        <Title level={4} className="section-title">{title}</Title>
+        <Title level={4} className="section-title">
+          {title}
+        </Title>
       </Divider>
       <Table
         columns={[
@@ -120,7 +87,9 @@ const StatusView = () => {
 
   return (
     <div className="status-view-container">
-      <Title level={3} className="main-title">Farmer Details Overview</Title>
+      <Title level={3} className="main-title">
+        Farmer Details Overview
+      </Title>
       {renderSection("Demographic Details", demographicFields)}
       {renderSection("Agricultural Details", agriculturalFields)}
       {renderSection("Land Details", landFields)}

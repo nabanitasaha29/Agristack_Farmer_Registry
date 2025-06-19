@@ -29,7 +29,7 @@ const FarmerDashboard = () => {
             fontSize: { xs: '2.5rem', md: '3.5rem' }
           }}
         >
-          Welcome !
+          Welcome {username}!
         </Typography>
         
         <Typography 

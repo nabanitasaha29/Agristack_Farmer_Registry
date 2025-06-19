@@ -36,15 +36,7 @@ export const nigeriaConfig = {
     required: true,
   },
 
-  // columns: {
-  //   State: "state_name",
-  //   "Local Government": "local_govt_name",
-  //   Ward: "ward_name",
-  // },
-  // parentColumns: {
-  //   "Local Government": "state_name",
-  //   Ward: "local_govt_name",
-  // },
+
 
   columns: {
     State: "level_1_name",

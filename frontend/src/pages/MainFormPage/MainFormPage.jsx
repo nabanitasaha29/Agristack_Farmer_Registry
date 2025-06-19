@@ -203,57 +203,66 @@ const MainFormPage = () => {
         const dob = demographic.fr_dob;
         const formattedPassword = demographic.user_raw_Dob || "";
         const dateFormatUsed = demographic.dateFormatUsed || "DD/MM/YYYY";
-        const passwordFormatHint = dateFormatUsed.replace(/\W/g, '');
+        const passwordFormatHint = dateFormatUsed.replace(/\W/g, "");
         console.log("Password", formattedPassword);
 
         const keycloakPayload = {
-          user_id: farmerId.toString(),
-          role_name: "farmer",
           username: farmerId.toString(),
           enabled: true,
           requiredActions: ["UPDATE_PASSWORD"],
           credentials: [
             {
               type: "password",
-              value: formattedPassword, //dob
-              temporary: false
-            }
+              value: formattedPassword, // e.g., dob
+              temporary: false,
+            },
           ],
-          fr_farmer_id: farmerId.toString(),
-          fr_mobile_number: "+918697353657", // later change to farmer mobile
-          fr_dob: dob
+          attributes: {
+            user_id: farmerId.toString(),
+            role_name: "farmer",
+            fr_farmer_id: farmerId.toString(),
+            fr_mobile_number: "+918697353657", // can replace with actual farmer mobile
+            fr_dob: dob,
+          },
         };
 
         try {
           // BEFORE making the keycloak credentials call
-          await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+          await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
 
           await axios.post(
             "https://developer.agristack.gov.in/n8n/webhook/send-creds",
             keycloakPayload,
             {
               headers: {
-                "Content-Type": "application/json"
-              }
+                "Content-Type": "application/json",
+              },
             }
           );
           setTimeout(async () => {
-            const secondResponse = await axios.post("https://developer.agristack.gov.in/n8n/webhook/send-creds", keycloakPayload);
+            const secondResponse = await axios.post(
+              "https://developer.agristack.gov.in/n8n/webhook/send-creds",
+              keycloakPayload
+            );
             console.log("Second request sent", secondResponse.data);
           }, 1000);
           Modal.success({
-            title: 'Registration Successful',
+            title: "Registration Successful",
             content: (
               <div>
                 <p>You have successfully registered.</p>
                 <p>
-                  Your credentials will be shared with you once your registration is approved.
-                  An SMS will be sent to your registered mobile number.
+                  Your credentials will be shared with you once your
+                  registration is approved. An SMS will be sent to your
+                  registered mobile number.
                 </p>
-                <p><strong>Password Format Hint:</strong> Your DOB in this format: <code>{passwordFormatHint}</code></p>
+                <p>
+                  <strong>Password Format Hint:</strong> Your DOB in this
+                  format: <code>{passwordFormatHint}</code>
+                </p>
               </div>
             ),
-            okText: 'Close',
+            okText: "Close",
             onOk: () => {
               setFormData({
                 demographic: {},
@@ -267,7 +276,7 @@ const MainFormPage = () => {
               } else {
                 navigate("/");
               }
-            }
+            },
           });
         } catch (keycloakError) {
           console.error("Keycloak User Creation Failed:", keycloakError);
@@ -312,7 +321,7 @@ const MainFormPage = () => {
                 fr_dob: formData.demographic.fr_dob
                   ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
                   : // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-                  null,
+                    null,
               }}
             />
           )}
