@@ -6,17 +6,31 @@ import { countryConfigs } from "../config/index.js";
 
 const router = express.Router();
 
+// router.get("/hierarchy", async (req, res) => {
+//   try {
+//     const hierarchy = await getLocationHierarchy();
+//     res.json({
+//       countryCode: process.env.ACTIVE_COUNTRY || "IN", // Return active country code
+//       hierarchy,
+//     });
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to fetch hierarchy" });
+//   }
+// });
 router.get("/hierarchy", async (req, res) => {
   try {
-    const hierarchy = await getLocationHierarchy();
+    const countryParam = req.query.country;
+    const hierarchy = await getLocationHierarchy(countryParam);
+
     res.json({
-      countryCode: process.env.ACTIVE_COUNTRY || "IN", // Return active country code
+      countryCode: countryParam || process.env.ACTIVE_COUNTRY || "IN",
       hierarchy,
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch hierarchy" });
   }
-});
+});//new updated
+
 
 //Data for Dropdowns
 router.get("/location-options", async (req, res) => {
@@ -28,7 +42,9 @@ router.get("/location-options", async (req, res) => {
     }
 
     const options = await getLocationData(levelName, parentValue);
+
     res.json({ countryCode: process.env.ACTIVE_COUNTRY || "IN", options });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -126,11 +142,6 @@ router.get("/date-format", (req, res) => {
   });
 });
 
-
-
-
-
-
 // New route for postal code config
 router.get("/postal-code-config", (req, res) => {
   const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
@@ -148,12 +159,10 @@ router.get("/postal-code-config", (req, res) => {
   });
 });
 
-
-
-
 // New route for land identifiers
 router.get("/land-identifiers", (req, res) => {
-  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  // const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const activeCountry = req.query.country || process.env.ACTIVE_COUNTRY || "IN";
   const config = countryConfigs[activeCountry];
 
   if (!config || !config.landIdentifiers) {

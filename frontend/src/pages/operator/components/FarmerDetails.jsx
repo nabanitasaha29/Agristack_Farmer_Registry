@@ -10,6 +10,8 @@ const FarmerDetails = () => {
   const [lands, setLands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [locationLevels, setLocationLevels] = useState([]);//new
+  const [landIdentifiers, setLandIdentifiers] = useState([]);
 
   useEffect(() => {
     const fetchFarmerDetails = async () => {
@@ -35,59 +37,75 @@ const FarmerDetails = () => {
     fetchFarmerDetails();
   }, [farmerId]);
 
+  // Fetch location hierarchy for the country of registration
+  useEffect(() => {
+    if (!farmer?.fr_country) return;
+
+    const fetchConfigs = async () => {
+      try {
+        const [hierarchyRes, identifiersRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/location/hierarchy', {
+            params: { country: farmer.fr_country },
+          }),
+          axios.get('http://localhost:5000/api/location/land-identifiers', {
+            params: { country: farmer.fr_country }, // Optional if backend supports it
+          }),
+        ]);
+
+        const sortedLevels = hierarchyRes.data.hierarchy.sort(
+          (a, b) => a.level_order - b.level_order
+        );
+        setLocationLevels(sortedLevels);
+        setLandIdentifiers(identifiersRes.data?.landIdentifiers || []);
+      } catch (err) {
+        console.error('Failed to fetch location or identifiers:', err);
+      }
+    };
+
+    fetchConfigs();
+  }, [farmer?.fr_country]);
+  //new
   const handleBackClick = () => {
     navigate("/operator/registered-farmers");
   };
 
   // Function to get location columns for land table
   const getLocationColumns = (land) => {
-    const columns = [];
-    for (let i = 1; i <= 6; i++) {
-      const levelKey = `fr_level_${i}_id`;
-      if (land[levelKey]) {
-        columns.push(<td key={levelKey}>{land[levelKey] || "-"}</td>);
-      }
-    }
-    return columns;
-  };
-
-  // Function to get location headers for land table
-  const getLocationHeaders = () => {
-    const headers = [];
-    // Check all lands to find the maximum level present
-    let maxLevel = 1;
-    lands.forEach((land) => {
-      for (let i = 1; i <= 6; i++) {
-        if (land[`fr_level_${i}_id`]) {
-          maxLevel = Math.max(maxLevel, i);
-        }
-      }
+    return locationLevels.map((level) => {
+      const key = `fr_level_${level.level_order}_id`;
+      return <td key={key}>{land[key] || '-'}</td>;
     });
-
-    for (let i = 1; i <= maxLevel; i++) {
-      headers.push(<th key={`level-${i}`}>Level {i}</th>);
-    }
-    return headers;
   };
 
-  // Function to get location detail items for demographic section
+  const getLocationHeaders = () => {
+    return locationLevels.map((level) => (
+      <th key={`level-${level.level_order}`}>{level.level_name}</th>
+    ));
+  };
+
   const getLocationDetailItems = () => {
-    const items = [];
-    for (let i = 1; i <= 6; i++) {
-      const levelKey = `fr_level_${i}_id`;
-      if (farmer[levelKey]) {
-        items.push(
-          <DetailItem
-            key={levelKey}
-            label={`Level ${i}`}
-            value={farmer[levelKey]}
-          />
-        );
-      }
-    }
-    return items;
+    return locationLevels.map((level) => {
+      const key = `fr_level_${level.level_order}_id`;
+      return (
+        <DetailItem
+          key={key}
+          label={level.level_name}
+          value={farmer?.[key] || '-'}
+        />
+      );
+    });
   };
-
+  const getIdentifierHeaders = () => {
+    return landIdentifiers.map((id, index) => (
+      <th key={`identifier-${index}`}>{id.name}</th>
+    ));
+  };
+  const getIdentifierColumns = (land) => {
+    return landIdentifiers.map((_, index) => {
+      const key = `fr_land_identifier_${index + 1}`;
+      return <td key={key}>{land[key] || '-'}</td>;
+    });
+  };
   if (loading)
     return (
       <div className="loading-container">
@@ -169,9 +187,9 @@ const FarmerDetails = () => {
               <thead>
                 <tr>
                   <th>Land ID</th>
-                  <th>Identifier 1</th>
-                  <th>Identifier 2</th>
-                  <th>Identifier 3</th>
+                  {getIdentifierHeaders()}
+                  {/* <th>Identifier 2</th>
+                  <th>Identifier 3</th> */}
                   <th>Area</th>
                   <th>Unit</th>
                   {getLocationHeaders()}
@@ -181,9 +199,9 @@ const FarmerDetails = () => {
                 {lands.map((land) => (
                   <tr key={land.fr_land_id}>
                     <td>{land.fr_land_id}</td>
-                    <td>{land.fr_land_identifier_1 || "-"}</td>
-                    <td>{land.fr_land_identifier_2 || "-"}</td>
-                    <td>{land.fr_land_identifier_3 || "-"}</td>
+                    {getIdentifierColumns(land)}
+                    {/* <td>{land.fr_land_identifier_2 || "-"}</td>
+                    <td>{land.fr_land_identifier_3 || "-"}</td> */}
                     <td>{land.fr_land_area}</td>
                     <td>{land.fr_area_unit}</td>
                     {getLocationColumns(land)}
@@ -205,9 +223,8 @@ const FarmerDetails = () => {
             />
             <DetailItem
               label="Total Land Area"
-              value={`${farmer.fr_total_land_area_owned} ${
-                lands[0]?.fr_area_unit || "units"
-              }`}
+              value={`${farmer.fr_total_land_area_owned} ${lands[0]?.fr_area_unit || "units"
+                }`}
             />
             <DetailItem
               label="Number of Lands Owned"

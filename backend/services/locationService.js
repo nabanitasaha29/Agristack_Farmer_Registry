@@ -3,8 +3,10 @@ import pool from "../config/db.js";
 
 import { fallbackHierarchy, country, countryConfigs } from "../config/index.js"; // Import 'country' as active country
 
-export async function getLocationHierarchy() {
-  const activeCountry = country || "IN"; // Use 'country' from env/config or default to 'IN'
+// export async function getLocationHierarchy() {
+// const activeCountry = country || "IN"; // Use 'country' from env/config or default to 'IN'
+export async function getLocationHierarchy(inputCountry) {
+  const selectedCountry = inputCountry || country || "IN";
 
   const query = `
     SELECT level_order, level_name, parent_level
@@ -13,7 +15,9 @@ export async function getLocationHierarchy() {
     ORDER BY level_order
   `;
   try {
-    const { rows } = await pool.query(query, [activeCountry]);
+    // const { rows } = await pool.query(query, [activeCountry]);
+    const { rows } = await pool.query(query, [selectedCountry]);
+
     if (rows.length > 0) {
       return rows; // DB data
     } else {
