@@ -5,6 +5,27 @@ export const indiaHierarchy = [
   { levelOrder: 4, levelName: "Village", parentLevel: "Subdistrict" },
 ];
 export const indiaConfig = {
+  landId: "fr_land_id",
+  landIdentifiersMapping: {
+    identifier1: "fr_survey_number",
+    identifier2: "fr_sub_division_number",
+    identifier3: "fr_plot_number",
+  },
+  area: "fr_land_area",
+  areaUnitMapping: "fr_area_unit",
+  geometry: "fr_land_geometry",
+  location: {
+    level_1_name: "fr_state",
+    level_2_name: "fr_district",
+    level_3_name: "fr_sub_district",
+    level_4_name: "fr_village",
+  },
+  locationIds: {
+    level_1_id: "fr_state_id",
+    level_2_id: "fr_district_id",
+    level_3_id: "fr_sub_district_id",
+    level_4_id: "fr_village_id",
+  },
   areaUnit: "hectares",
   mobileCode: "91",
   // tableName: "lgd_master",

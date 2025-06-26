@@ -6,6 +6,29 @@ export const rwandaHierarchy = [
   { levelOrder: 5, levelName: "Village", parentLevel: "Cell" },
 ];
 export const rwandaConfig = {
+  landId: "fr_land_id",
+  landIdentifiersMapping: {
+    identifier1: "fr_upi",
+    identifier2: "fr_land_title_number",
+    identifier3: "fr_plot_number",
+  },
+  area: "fr_land_area",
+  areaUnitMapping: "fr_area_unit",
+  geometry: "fr_land_geometry",
+  location: {
+    level_1_name: "fr_province",
+    level_2_name: "fr_district",
+    level_3_name: "fr_sector",
+    level_4_name: "fr_cell",
+    level_5_name: "fr_village",
+  },
+  locationIds: {
+    level_1_id: "fr_province_id",
+    level_2_id: "fr_district_id",
+    level_3_id: "fr_sector_id",
+    level_4_id: "fr_cell_id",
+    level_5_id: "fr_village_id",
+  },
   areaUnit: "acres",
   mobileCode: "250",
   // tableName: "rwanda_location_data",

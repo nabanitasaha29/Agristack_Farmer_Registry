@@ -5,6 +5,25 @@ export const nigeriaHierarchy = [
 ];
 // New export: table and column mappings
 export const nigeriaConfig = {
+  landId: "fr_land_id",
+  landIdentifiersMapping: {
+    identifier1: "fr_survey_plan_number",
+    identifier2: "fr_plot_number",
+    identifier3: "fr_block_number",
+  },
+  area: "fr_land_area",
+  areaUnitMapping: "fr_area_unit",
+  geometry: "fr_land_geometry",
+  location: {
+    level_1_name: "fr_state",
+    level_2_name: "fr_lga",
+    level_3_name: "fr_ward",
+  },
+  locationIds: {
+    level_1_id: "fr_state_id",
+    level_2_id: "fr_lga_id",
+    level_3_id: "fr_ward_id",
+  },
   areaUnit: "hectares",
   mobileCode: "234",
   // tableName: "nigeria_location_lgd", // your actual Nigeria location data table

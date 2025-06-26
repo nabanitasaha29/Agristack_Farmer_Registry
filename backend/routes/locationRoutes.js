@@ -177,6 +177,28 @@ router.get("/land-identifiers", (req, res) => {
   });
 });
 
+router.get("/field-mappings", (req, res) => {
+  const activeCountry = process.env.ACTIVE_COUNTRY || "IN";
+  const config = countryConfigs[activeCountry];
 
+  if (!config) {
+    return res.status(404).json({ error: "Country config not found" });
+  }
+
+  const fieldMappings = {
+    landId: config.landId,
+    landIdentifiers: config.landIdentifiersMapping,
+    area: config.area,
+    areaUnit: config.areaUnitMapping,
+    geometry: config.geometry,
+    location: config.location,
+    locationIds: config.locationIds,
+  };
+
+  res.json({
+    countryCode: activeCountry,
+    fieldMappings,
+  });
+});
 
 export default router;

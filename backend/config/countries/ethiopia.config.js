@@ -6,6 +6,27 @@ export const ethiopiaHierarchy = [
 ];
 
 export const ethiopiaConfig = {
+  landId: "fr_land_id",
+  landIdentifiersMapping: {
+    identifier1: "fr_parcel_number",
+    identifier2: "fr_holding_number",
+    identifier3: "fr_kebele_registration_id",
+  },
+  area: "fr_land_area",
+  areaUnitMapping: "fr_area_unit",
+  geometry: "fr_land_geometry",
+  location: {
+    level_1_name: "fr_region",
+    level_2_name: "fr_zone",
+    level_3_name: "fr_woreda",
+    level_4_name: "fr_kebele",
+  },
+  locationIds: {
+    level_1_id: "fr_region_id",
+    level_2_id: "fr_zone_id",
+    level_3_id: "fr_woreda_id",
+    level_4_name: "fr_kebele_id",
+  },
   areaUnit: "hectares",
   mobileCode: "251",
   // tableName: "ethiopia_location_data",

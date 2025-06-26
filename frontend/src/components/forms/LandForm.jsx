@@ -172,7 +172,7 @@
 //   message.success("Land added successfully");
 //   console.groupEnd();
 // };
-  
+
 //   const handleSubmit = () => {
 //     console.log("Submitting lands:", lands);
 //     if (lands.length === 0) {
@@ -345,7 +345,7 @@
 
 
 
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect, useMemo } from "react";
 import {
   Form,
   Input,
@@ -387,6 +387,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
   const [countryCode, setCountryCode] = useState("IN");
   const [showManualForm, setShowManualForm] = useState(false);
   const [manualFormLocation, setManualFormLocation] = useState({});
+  const [fieldMappings, setFieldMappings] = useState({});
 
   React.useImperativeHandle(ref, () => ({
     submit: () => form.submit(),
@@ -416,15 +417,17 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
       try {
         setLoading(true);
         const [
-          hierarchyRes, 
-          identifiersRes, 
+          hierarchyRes,
+          identifiersRes,
           areaUnitRes,
-          countryRes
+          countryRes,
+          fieldMappingsRes
         ] = await Promise.all([
           axios.get("http://localhost:5000/api/location/hierarchy"),
           axios.get("http://localhost:5000/api/location/land-identifiers"),
           axios.get("http://localhost:5000/api/location/area-unit"),
-          axios.get("http://localhost:5000/api/location/active-country")
+          axios.get("http://localhost:5000/api/location/active-country"),
+          axios.get("http://localhost:5000/api/location/field-mappings")
         ]);
 
         setLocationHierarchy(
@@ -443,6 +446,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
 
         setAreaUnit(areaUnitRes.data?.areaUnit || "hectares");
         setCountryCode(countryRes.data?.countryCode || "IN");
+        setFieldMappings(fieldMappingsRes.data?.fieldMappings || {});
       } catch (error) {
         console.error("Failed to fetch country config:", error);
         message.warning("Using default configuration");
@@ -456,13 +460,13 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
 
   useEffect(() => {
     if (Object.keys(landLocation).length > 0) {
-      const lowestLevel = locationHierarchy.reduce((prev, current) => 
+      const lowestLevel = locationHierarchy.reduce((prev, current) =>
         (prev.levelOrder > current.levelOrder) ? prev : current
       );
-      
+
       const levelName = lowestLevel?.levelName || '';
       const levelValue = landLocation[`level_${lowestLevel?.levelOrder}`];
-      
+
       if (levelValue && levelName) {
         fetchLandsAtLocation(levelName, levelValue);
       }
@@ -480,7 +484,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
           "loc-level-id": levelValue.code || levelValue
         }
       );
-      
+
       setAvailableLands(response.data || []);
     } catch (error) {
       console.error("Failed to fetch lands:", error);
@@ -488,6 +492,24 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
     } finally {
       setFetchingLands(false);
     }
+  };
+  const formatLandsForApp = (landsToAdd, fieldMappings) => {
+    return landsToAdd.map((land) => ({
+      fr_land_identifier_1: land[fieldMappings?.landIdentifiers?.identifier1],
+      fr_land_identifier_2: land[fieldMappings?.landIdentifiers?.identifier2],
+      fr_land_identifier_3: land[fieldMappings?.landIdentifiers?.identifier3],
+      fr_land_area: land[fieldMappings?.area],
+      fr_area_unit: land[fieldMappings?.areaUnit],
+      fr_land_geometry: land[fieldMappings?.geometry],
+      landLocation: {
+        level_1_name: land[fieldMappings?.location?.level_1_name],
+        level_2_name: land[fieldMappings?.location?.level_2_name],
+        level_3_name: land[fieldMappings?.location?.level_3_name],
+        level_4_name: land[fieldMappings?.location?.level_4_name],
+        level_5_name: land[fieldMappings?.location?.level_5_name],
+      },
+      id: land[fieldMappings?.landId],
+    }));
   };
 
   const handleAddSelectedLands = () => {
@@ -497,7 +519,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
     }
 
     // Filter out lands that are already added
-    const landsToAdd = selectedLands.filter(land => 
+    const landsToAdd = selectedLands.filter(land =>
       !lands.some(addedLand => addedLand.id === land.fr_land_id)
     );
 
@@ -506,22 +528,8 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
       return;
     }
 
-    const newLands = landsToAdd.map(land => ({
-      fr_land_identifier_1: land.fr_survey_number,
-      fr_land_identifier_2: land.fr_sub_division_number,
-      fr_land_identifier_3: land.fr_plot_number,
-      fr_land_area: land.fr_land_area,
-      fr_area_unit: land.fr_area_unit,
-      fr_land_geometry: land.fr_land_geometry,
-      landLocation: {
-        level_1_name: land.fr_state,
-        level_2_name: land.fr_district,
-        level_3_name: land.fr_sub_district,
-        level_4_name: land.fr_village,
-      },
-      id: land.fr_land_id,
-    }));
 
+    const newLands = formatLandsForApp(landsToAdd, fieldMappings);
     setLands([...lands, ...newLands]);
     setSelectedLands([]);
     message.success(`${newLands.length} land(s) added successfully`);
@@ -541,7 +549,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
     locationHierarchy.forEach((level) => {
       const val = manualFormLocation[`level_${level.levelOrder}`];
       if (val) {
-        locationData[`level_${level.levelOrder}_name`] = 
+        locationData[`level_${level.levelOrder}_name`] =
           typeof val === 'object' ? val.name : val;
       }
     });
@@ -619,183 +627,191 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
       },
     ];
   };
+  const getIdentifierColumns = (fieldMappings, displayIdentifiers) => {
+    const identifierMappings = fieldMappings.landIdentifiers || {};
 
-  const availableLandsColumns = [
-    {
-      title: 'Select',
-      dataIndex: 'fr_land_id',
-      render: (id) => (
-        <Checkbox
-          checked={selectedLands.some(land => land.fr_land_id === id)}
-          onChange={(e) => {
-            if (e.target.checked) {
-              if (isLandAdded(id)) {
-                message.warning("This land has already been added");
-                return;
+    return Object.entries(identifierMappings).map(([key, columnName], index) => {
+      const labelMeta = displayIdentifiers?.[index];
+      const title = labelMeta?.name || `Identifier ${index + 1}`;
+
+      return {
+        title,
+        dataIndex: columnName,
+        key: columnName,
+        render: (text) => text || "-",
+        onFilter: (value, record) =>
+          (record[columnName] || "").toLowerCase().includes(value.toLowerCase()),
+        filterIcon: (filtered) => (
+          <Tooltip title={`Search ${title}`}>
+            <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+          </Tooltip>
+        ),
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+          <div style={{ padding: 8 }}>
+            <Input
+              placeholder={`Search ${title}`}
+              value={selectedKeys[0]}
+              onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => confirm()}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </div>
+        ),
+      };
+    });
+  };
+  const identifierColumns = getIdentifierColumns(fieldMappings, landIdentifiers);
+
+  const availableLandsColumns = useMemo(() => {
+    if (!fieldMappings?.landIdentifiers || !fieldMappings?.location) return [];
+
+    const {
+      landId,
+      area,
+      areaUnit,
+    } = fieldMappings;
+
+
+    return [
+      {
+        title: 'Select',
+        dataIndex: landId,
+        render: (id) => (
+          <Checkbox
+            checked={selectedLands.some(land => land[landId] === id)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                if (isLandAdded(id)) {
+                  message.warning("This land has already been added");
+                  return;
+                }
+                const landToAdd = availableLands.find(land => land[landId] === id);
+                setSelectedLands([...selectedLands, landToAdd]);
+              } else {
+                setSelectedLands(selectedLands.filter(land => land[landId] !== id));
               }
-              const landToAdd = availableLands.find(land => land.fr_land_id === id);
-              setSelectedLands([...selectedLands, landToAdd]);
-            } else {
-              setSelectedLands(selectedLands.filter(land => land.fr_land_id !== id));
-            }
-          }}
-          disabled={isLandAdded(id)}
-        />
-      ),
-      fixed: 'left',
-      width: 80,
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      width: 120,
-      render: (_, record) => (
-        isLandAdded(record.fr_land_id) ? (
-          <Tag icon={<CheckCircleOutlined />} color="success">
-            Added
-          </Tag>
-        ) : null
-      ),
-    },
-    {
-      title: 'Survey Number',
-      dataIndex: 'fr_survey_number',
-      filterIcon: (filtered) => (
-        <Tooltip title="Search survey number">
-          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-        </Tooltip>
-      ),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search survey number"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
+            }}
+            disabled={isLandAdded(id)}
           />
-          <Button
-            type="primary"
-            onClick={() => confirm()}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-        </div>
-      ),
-      onFilter: (value, record) =>
-        record.fr_survey_number.toLowerCase().includes(value.toLowerCase()),
-    },
-    // ... rest of the columns remain the same
-    {
-      title: 'Sub Division',
-      dataIndex: 'fr_sub_division_number',
-      filterIcon: (filtered) => (
-        <Tooltip title="Search sub division">
-          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-        </Tooltip>
-      ),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search sub division"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Button
-            type="primary"
-            onClick={() => confirm()}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-        </div>
-      ),
-      onFilter: (value, record) =>
-        record.fr_sub_division_number.toLowerCase().includes(value.toLowerCase()),
-    },
-    {
-      title: 'Plot Number',
-      dataIndex: 'fr_plot_number',
-      filterIcon: (filtered) => (
-        <Tooltip title="Search plot number">
-          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-        </Tooltip>
-      ),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search plot number"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Button
-            type="primary"
-            onClick={() => confirm()}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-        </div>
-      ),
-      onFilter: (value, record) =>
-        record.fr_plot_number.toLowerCase().includes(value.toLowerCase()),
-    },
-    {
-      title: `Area (${areaUnit})`,
-      render: (record) => `${record.fr_land_area} ${record.fr_area_unit}`,
-      sorter: (a, b) => a.fr_land_area - b.fr_land_area,
-    },
-    {
-      title: 'Location',
-      render: (record) => `${record.fr_village}, ${record.fr_sub_district}`,
-      filterIcon: (filtered) => (
-        <Tooltip title="Search location">
-          <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-        </Tooltip>
-      ),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search location"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Button
-            type="primary"
-            onClick={() => confirm()}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-        </div>
-      ),
-      onFilter: (value, record) =>
-        `${record.fr_village} ${record.fr_sub_district}`.toLowerCase().includes(value.toLowerCase()),
-    }
-  ];
+        ),
+        fixed: 'left',
+        width: 80,
+      },
+      {
+        title: 'Status',
+        key: 'status',
+        width: 120,
+        render: (record) =>
+          isLandAdded(record[landId]) ? (
+            <Tag icon={<CheckCircleOutlined />} color="success">
+              Added
+            </Tag>
+          ) : null,
+      },
+      // {
+      //   title: 'Survey Number',
+      //   dataIndex: landIdentifiers.identifier1,
+      //   onFilter: (value, record) =>
+      //     record[landIdentifiers.identifier1]?.toLowerCase().includes(value.toLowerCase()),
+      //   // Same filter/search box as before...
+      // },
+      // {
+      //   title: 'Sub Division',
+      //   dataIndex: landIdentifiers.identifier2,
+      //   onFilter: (value, record) =>
+      //     record[landIdentifiers.identifier2]?.toLowerCase().includes(value.toLowerCase()),
+      // },
+      // {
+      //   title: 'Plot Number',
+      //   dataIndex: landIdentifiers.identifier3,
+      //   onFilter: (value, record) =>
+      //     record[landIdentifiers.identifier3]?.toLowerCase().includes(value.toLowerCase()),
+      // },
+      ...identifierColumns,
+      {
+        title: `Area (${areaUnit})`,
+        render: (record) =>
+          `${record[area]} ${record[areaUnit]}`,
+        sorter: (a, b) => a[area] - b[area],
+      },
+      // {
+      //   title: 'Location',
+      //   render: (record) =>
+      //     `${record[location.level_4_name]}, ${record[location.level_3_name]}`,
+      //   onFilter: (value, record) =>
+      //     `${record[location.level_4_name]} ${record[location.level_3_name]}`.toLowerCase().includes(value.toLowerCase()),
+      // }
+      {
+        title: 'Location',
+        render: (record) => {
+          const loc = fieldMappings.location;
+          const locationKeys = Object.keys(loc || {});
+          const totalLevels = locationKeys.length;
+
+          const lastKey = loc[`level_${totalLevels}_name`];
+          const secondLastKey = loc[`level_${totalLevels - 1}_name`];
+
+          const last = record[lastKey] || "-";
+          const secondLast = record[secondLastKey] || "-";
+
+          return `${last}, ${secondLast}`;
+        },
+        filterIcon: (filtered) => (
+          <Tooltip title="Search location">
+            <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+          </Tooltip>
+        ),
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+          <div style={{ padding: 8 }}>
+            <Input
+              placeholder="Search location"
+              value={selectedKeys[0]}
+              onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => confirm()}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </div>
+        ),
+
+        onFilter: (value, record) => {
+          const loc = fieldMappings.location;
+          const locationKeys = Object.keys(loc || {});
+          const totalLevels = locationKeys.length;
+
+          const lastKey = loc[`level_${totalLevels}_name`];
+          const secondLastKey = loc[`level_${totalLevels - 1}_name`];
+
+          const last = record[lastKey] || "";
+          const secondLast = record[secondLastKey] || "";
+
+          return `${last} ${secondLast}`.toLowerCase().includes(value.toLowerCase());
+        },
+      }
+
+    ];
+  }, [fieldMappings, selectedLands, availableLands]);
 
   if (loading) {
     return (
