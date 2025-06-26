@@ -21,16 +21,27 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY"); // Default fallback
 
 
+  // React.useImperativeHandle(ref, () => ({
+  //   submit: () => form.submit(),
+  //   validateFields: () => form.validateFields(),
+  //   // getFieldsValue: () => form.getFieldsValue(),
+  //   getFieldsValue: () => ({
+  //     ...form.getFieldsValue(),
+  //     fr_mobile_number: `+${mobileCode}${form.getFieldValue("fr_mobile_number")}`,
+  //     locationLevels: selectedLocation, // <-- Ensure location is returned
+  //   }),
+  // }));
+
+
   React.useImperativeHandle(ref, () => ({
-    submit: () => form.submit(),
-    validateFields: () => form.validateFields(),
-    // getFieldsValue: () => form.getFieldsValue(),
-    getFieldsValue: () => ({
-      ...form.getFieldsValue(),
-      fr_mobile_number: `+${mobileCode}${form.getFieldValue("fr_mobile_number")}`,
-      locationLevels: selectedLocation, // <-- Ensure location is returned
-    }),
-  }));
+  submit: () => form.submit(),
+  validateFields: () => form.validateFields(),
+  getFieldsValue: () => ({
+    ...form.getFieldsValue(),
+    fr_mobile_number: `+${mobileCode}${form.getFieldValue("fr_mobile_number")}`,
+    locationLevels: selectedLocation, // This now contains both names and codes
+  }),
+}));
 
   useEffect(() => {
     axios
@@ -115,23 +126,50 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
     fetchCountryAndMobileCode();
   }, []);
 
+  // const handleFinish = (values) => {
+  //   const fullNumber = `+${mobileCode}${values.fr_mobile_number}`;
+  //   const rawDob = values.fr_dob;
+  //   const formattedPassword = dayjs(rawDob).format(dateFormat.replace(/\W/g, ""));
+  //   const formattedDob = values.fr_dob
+  //     ? dayjs(values.fr_dob).format('YYYY-MM-DD')
+  //     // ? dayjs(values.fr_dob).format(dateFormat)
+  //     : null;
+  //   onSubmit({
+  //     ...values,
+  //     fr_mobile_number: fullNumber,
+  //     fr_dob: formattedDob,
+  //     locationLevels: selectedLocation,
+  //     user_raw_Dob: formattedPassword,
+  //     dateFormatUsed: dateFormat,
+  //   });
+  // };
+
+
   const handleFinish = (values) => {
-    const fullNumber = `+${mobileCode}${values.fr_mobile_number}`;
-    const rawDob = values.fr_dob;
-    const formattedPassword = dayjs(rawDob).format(dateFormat.replace(/\W/g, ""));
-    const formattedDob = values.fr_dob
-      ? dayjs(values.fr_dob).format('YYYY-MM-DD')
-      // ? dayjs(values.fr_dob).format(dateFormat)
-      : null;
-    onSubmit({
-      ...values,
-      fr_mobile_number: fullNumber,
-      fr_dob: formattedDob,
-      locationLevels: selectedLocation,
-      user_raw_Dob: formattedPassword,
-      dateFormatUsed: dateFormat,
-    });
-  };
+  const fullNumber = `+${mobileCode}${values.fr_mobile_number}`;
+  const rawDob = values.fr_dob;
+  const formattedPassword = dayjs(rawDob).format(dateFormat.replace(/\W/g, ""));
+  const formattedDob = values.fr_dob
+    ? dayjs(values.fr_dob).format('YYYY-MM-DD')
+    : null;
+    
+  // Extract only names from selectedLocation
+  const locationNamesOnly = {};
+  Object.keys(selectedLocation).forEach(key => {
+    if (selectedLocation[key] && selectedLocation[key].name) {
+      locationNamesOnly[key] = selectedLocation[key].name;
+    }
+  });
+
+  onSubmit({
+    ...values,
+    fr_mobile_number: fullNumber,
+    fr_dob: formattedDob,
+    locationLevels: locationNamesOnly, // Send only names
+    user_raw_Dob: formattedPassword,
+    dateFormatUsed: dateFormat,
+  });
+};
 
   return (
     <Form
