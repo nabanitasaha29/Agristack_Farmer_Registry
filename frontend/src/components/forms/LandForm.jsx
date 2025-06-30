@@ -362,7 +362,8 @@ import {
   Divider,
   Collapse,
   Tooltip,
-  Tag
+  Tag,
+  Spin
 } from "antd";
 import { DownOutlined, UpOutlined, SearchOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
@@ -824,51 +825,58 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {} }, ref) => {
   return (
     <Card title={<Title level={4}>Land Details</Title>}>
       <div className="land-form-container">
-        <div className="location-selection-section">
-          <h3>Select Location to View Lands</h3>
-          <LocationSelector
-            form={form}
-            fieldNamePrefix="landLocationLevels"
-            hierarchy={locationHierarchy}
-            onSelectionChange={(selected) => {
-              const newLocation = {};
-              locationHierarchy.forEach((level) => {
-                const matchKey = Object.keys(selected).find(
-                  (key) =>
-                    key.toLowerCase() === level.levelName.toLowerCase() ||
-                    key === `level_${level.levelOrder}`
-                );
-                if (matchKey && selected[matchKey]) {
-                  newLocation[`level_${level.levelOrder}`] = selected[matchKey];
-                }
-              });
-              setLandLocation(newLocation);
-            }}
-          />
-        </div>
-
-        {availableLands.length > 0 && (
-          <div className="available-lands-section">
-            <Divider orientation="left">Available Lands at Selected Location</Divider>
-            <Table
-              className="available-lands-table"
-              columns={availableLandsColumns}
-              dataSource={availableLands}
-              rowKey="fr_land_id"
-              pagination={false}
-              loading={fetchingLands}
-              scroll={{ x: 'max-content' }}
-              bordered
+        <Form form={form} layout="vertical">
+          <div className="location-selection-section">
+            <h3>Select Location to View Lands</h3>
+            <LocationSelector
+              form={form}
+              fieldNamePrefix="landLocationLevels"
+              hierarchy={locationHierarchy}
+              onSelectionChange={(selected) => {
+                const newLocation = {};
+                locationHierarchy.forEach((level) => {
+                  const matchKey = Object.keys(selected).find(
+                    (key) =>
+                      key.toLowerCase() === level.levelName.toLowerCase() ||
+                      key === `level_${level.levelOrder}`
+                  );
+                  if (matchKey && selected[matchKey]) {
+                    newLocation[`level_${level.levelOrder}`] = selected[matchKey];
+                  }
+                });
+                setLandLocation(newLocation);
+              }}
             />
-            <Button
-              type="primary"
-              onClick={handleAddSelectedLands}
-              style={{ marginTop: 16 }}
-              disabled={selectedLands.length === 0}
-            >
-              Add Selected Lands
-            </Button>
           </div>
+        </Form>
+
+        {/* {availableLands.length > 0 && ( */}
+        {(availableLands.length > 0 || fetchingLands) && (
+          <Spin spinning={fetchingLands} tip="Loading lands...">
+            <div className="available-lands-section">
+              <Divider orientation="left">Available Lands at Selected Location</Divider>
+
+              <Table
+                className="available-lands-table"
+                columns={availableLandsColumns}
+                dataSource={availableLands}
+                rowKey="fr_land_id"
+                pagination={false}
+                loading={fetchingLands}
+                scroll={{ x: 'max-content' }}
+                bordered
+              />
+
+              <Button
+                type="primary"
+                onClick={handleAddSelectedLands}
+                style={{ marginTop: 16 }}
+                disabled={selectedLands.length === 0}
+              >
+                Add Selected Lands
+              </Button>
+            </div>
+          </Spin>
         )}
 
         {/* Rest of the component remains the same */}
