@@ -27,7 +27,7 @@ import "./LandForm.css";
 const { Title } = Typography;
 const { Panel } = Collapse;
 
-const LandForm = forwardRef(({ onSubmit, initialValues = {}, username  }, ref) => {
+const LandForm = forwardRef(({ onSubmit, initialValues = {}, username }, ref) => {
   const [form] = Form.useForm();
   const [landLocation, setLandLocation] = useState(initialValues.landLocation || {});
   const [areaUnit, setAreaUnit] = useState("");
@@ -136,7 +136,7 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {}, username  }, ref) =
           "country-code": countryCode,
           "loc-level": levelValue.name || levelValue,
           "loc-level-id": levelValue.code || levelValue,
-          "username": username || "system"  
+          "username": username || "system"
         }
       );
 
@@ -164,6 +164,8 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {}, username  }, ref) =
         level_5_name: land[fieldMappings?.location?.level_5_name],
       },
       id: land[fieldMappings?.landId],
+      match_score: land.match_score,
+      land_owner_name: land.land_owner_name,
     }));
   };
 

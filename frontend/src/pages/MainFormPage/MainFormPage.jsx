@@ -192,6 +192,8 @@ const MainFormPage = () => {
               fr_level_4_id: entry.landLocation?.level_4_name || "",
               fr_level_5_id: entry.landLocation?.level_5_name || "",
               fr_level_6_id: entry.landLocation?.level_6_name || "",
+              match_score: entry.match_score ?? 0,
+              land_owner_name: entry.land_owner_name || "",
             })),
           },
         };
@@ -201,6 +203,7 @@ const MainFormPage = () => {
           "http://localhost:5000/api/farmer/register",
           finalPayload
         );
+
         const farmerId = response.data.farmerId;
         const dob = demographic.fr_dob;
         const formattedPassword = demographic.user_raw_Dob || "";
@@ -323,7 +326,7 @@ const MainFormPage = () => {
                 fr_dob: formData.demographic.fr_dob
                   ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
                   : // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-                    null,
+                  null,
               }}
             />
           )}
@@ -334,9 +337,9 @@ const MainFormPage = () => {
               initialValues={{
                 ...formData.land,
                 lands: formData.land.entries,
-               
+
               }}
-              username={formData.demographic.fr_full_name || ""} 
+              username={formData.demographic.fr_full_name || ""}
             />
           )}
           {activeTab === 3 && (
