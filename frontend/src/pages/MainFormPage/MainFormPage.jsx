@@ -334,7 +334,9 @@ const MainFormPage = () => {
               initialValues={{
                 ...formData.land,
                 lands: formData.land.entries,
+               
               }}
+              username={formData.demographic.fr_full_name || ""} 
             />
           )}
           {activeTab === 3 && (
