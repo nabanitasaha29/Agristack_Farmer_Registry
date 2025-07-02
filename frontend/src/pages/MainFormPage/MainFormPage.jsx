@@ -154,7 +154,10 @@ const MainFormPage = () => {
           fr_postal_code: demographic.fr_postal_code || "",
 
           // created_by: username ?? "system",
-          created_by: username && username !== 'User' ? username : demographic.fr_full_name || "system",
+          created_by:
+            username && username !== "User"
+              ? username
+              : demographic.fr_full_name || "system",
 
           created_at: new Date().toISOString(),
           modified_by: null,
@@ -204,13 +207,15 @@ const MainFormPage = () => {
           finalPayload
         );
 
+        console.log("Farmer Registration Response:", response.data);
+
         const farmerId = response.data.farmerId;
         const dob = demographic.fr_dob;
         const formattedPassword = demographic.user_raw_Dob || "";
         const dateFormatUsed = demographic.dateFormatUsed || "DD/MM/YYYY";
         const passwordFormatHint = dateFormatUsed.replace(/\W/g, "");
         console.log("Password", formattedPassword);
-
+        const firstLandEntry = land.entries?.[0] || {}; // <- Add this before keycloakPayload
         const keycloakPayload = {
           username: farmerId.toString(),
           enabled: true,
@@ -228,6 +233,11 @@ const MainFormPage = () => {
             fr_farmer_id: farmerId.toString(),
             fr_mobile_number: "+918697353657", // can replace with actual farmer mobile
             fr_dob: dob,
+            match_score: firstLandEntry.match_score ?? 0,
+            land_owner_name: firstLandEntry.land_owner_name || "",
+
+            // match_score: entry.match_score ?? 0,
+            // land_owner_name: entry.land_owner_name || "",
           },
         };
 
@@ -326,7 +336,7 @@ const MainFormPage = () => {
                 fr_dob: formData.demographic.fr_dob
                   ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
                   : // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-                  null,
+                    null,
               }}
             />
           )}
@@ -337,7 +347,6 @@ const MainFormPage = () => {
               initialValues={{
                 ...formData.land,
                 lands: formData.land.entries,
-
               }}
               username={formData.demographic.fr_full_name || ""}
             />
