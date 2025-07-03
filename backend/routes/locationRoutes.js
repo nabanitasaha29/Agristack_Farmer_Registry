@@ -6,17 +6,7 @@ import { countryConfigs } from "../config/index.js";
 
 const router = express.Router();
 
-// router.get("/hierarchy", async (req, res) => {
-//   try {
-//     const hierarchy = await getLocationHierarchy();
-//     res.json({
-//       countryCode: process.env.ACTIVE_COUNTRY || "IN", // Return active country code
-//       hierarchy,
-//     });
-//   } catch (err) {
-//     res.status(500).json({ error: "Failed to fetch hierarchy" });
-//   }
-// });
+
 router.get("/hierarchy", async (req, res) => {
   try {
     const countryParam = req.query.country;

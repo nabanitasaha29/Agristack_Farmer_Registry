@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-//import moment from "moment";
 import axios from "axios";
 import { message, Spin, Modal } from "antd";
 import dayjs from "dayjs";
@@ -233,8 +232,6 @@ const MainFormPage = () => {
             fr_farmer_id: farmerId.toString(),
             fr_mobile_number: "+918697353657", // can replace with actual farmer mobile
             fr_dob: dob,
-            match_score: firstLandEntry.match_score ?? 0,
-            land_owner_name: firstLandEntry.land_owner_name || "",
 
             land_details: landEntries.map((entry) => ({
               fr_farmer_id: farmerId.toString(),
@@ -350,7 +347,7 @@ const MainFormPage = () => {
                 fr_dob: formData.demographic.fr_dob
                   ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
                   : // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-                  null,
+                    null,
               }}
             />
           )}
