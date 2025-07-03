@@ -4,6 +4,11 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import LocationSelector from "../LocationSelector";
+import {Tooltip} from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+
+
+
 
 const { Option } = Select;
 
@@ -182,15 +187,23 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
 
       <Row gutter={16}>
         <Col span={12}>
+
           <Form.Item
-            name="fr_full_name"
-            label="Full Name"
-            rules={[
-              { required: true, message: "Please input your Full Name!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+  name="fr_full_name"
+  label={
+    <span>
+      Full Name&nbsp;
+      <Tooltip title="Enter the same name as in your land registry to view your registered lands">
+        <InfoCircleOutlined style={{ color: "#1890ff", cursor: "pointer" }} />
+      </Tooltip>
+    </span>
+  }
+  rules={[{ required: true, message: "Please input your Full Name!" }]}
+>
+  <Input />
+</Form.Item>
+
+
         </Col>
         <Col span={12}>
           <Form.Item name="fr_local_language_name" label="Full Name in Local Language">
