@@ -236,8 +236,22 @@ const MainFormPage = () => {
             match_score: firstLandEntry.match_score ?? 0,
             land_owner_name: firstLandEntry.land_owner_name || "",
 
-            // match_score: entry.match_score ?? 0,
-            // land_owner_name: entry.land_owner_name || "",
+            land_details: landEntries.map((entry) => ({
+              fr_farmer_id: farmerId.toString(),
+              fr_land_identifier_1: entry.fr_land_identifier_1 || "",
+              fr_land_identifier_2: entry.fr_land_identifier_2 || "",
+              fr_land_identifier_3: entry.fr_land_identifier_3 || "",
+              fr_land_area: entry.fr_land_area || 0,
+              fr_area_unit: entry.fr_area_unit || "Acre",
+              fr_level_1_id: entry.landLocation?.level_1_name || "",
+              fr_level_2_id: entry.landLocation?.level_2_name || "",
+              fr_level_3_id: entry.landLocation?.level_3_name || "",
+              fr_level_4_id: entry.landLocation?.level_4_name || "",
+              fr_level_5_id: entry.landLocation?.level_5_name || "",
+              fr_level_6_id: entry.landLocation?.level_6_name || "",
+              match_score: entry.match_score ?? 0,
+              land_owner_name: entry.land_owner_name || "",
+            })),
           },
         };
 
@@ -336,7 +350,7 @@ const MainFormPage = () => {
                 fr_dob: formData.demographic.fr_dob
                   ? dayjs(formData.demographic.fr_dob, "YYYY-MM-DD")
                   : // ? dayjs(formData.demographic.fr_dob, formData.demographic.dateFormatUsed || 'YYYY-MM-DD')
-                    null,
+                  null,
               }}
             />
           )}
