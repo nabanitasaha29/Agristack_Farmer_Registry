@@ -214,7 +214,7 @@ const MainFormPage = () => {
         const dateFormatUsed = demographic.dateFormatUsed || "DD/MM/YYYY";
         const passwordFormatHint = dateFormatUsed.replace(/\W/g, "");
         console.log("Password", formattedPassword);
-        const firstLandEntry = land.entries?.[0] || {}; // <- Add this before keycloakPayload
+
         const keycloakPayload = {
           username: farmerId.toString(),
           enabled: true,
@@ -230,26 +230,25 @@ const MainFormPage = () => {
             user_id: farmerId.toString(),
             role_name: "farmer",
             fr_farmer_id: farmerId.toString(),
-            fr_mobile_number: "+918697353657", // can replace with actual farmer mobile
+            fr_mobile_number: "+918697353657", // Replace with actual mobile if needed
             fr_dob: dob,
-
-            land_details: landEntries.map((entry) => ({
-              fr_farmer_id: farmerId.toString(),
-              fr_land_identifier_1: entry.fr_land_identifier_1 || "",
-              fr_land_identifier_2: entry.fr_land_identifier_2 || "",
-              fr_land_identifier_3: entry.fr_land_identifier_3 || "",
-              fr_land_area: entry.fr_land_area || 0,
-              fr_area_unit: entry.fr_area_unit || "Acre",
-              fr_level_1_id: entry.landLocation?.level_1_name || "",
-              fr_level_2_id: entry.landLocation?.level_2_name || "",
-              fr_level_3_id: entry.landLocation?.level_3_name || "",
-              fr_level_4_id: entry.landLocation?.level_4_name || "",
-              fr_level_5_id: entry.landLocation?.level_5_name || "",
-              fr_level_6_id: entry.landLocation?.level_6_name || "",
-              match_score: entry.match_score ?? 0,
-              land_owner_name: entry.land_owner_name || "",
-            })),
           },
+          land_details: landEntries.map((entry) => ({
+            fr_farmer_id: farmerId.toString(),
+            fr_land_identifier_1: entry.fr_land_identifier_1 || "",
+            fr_land_identifier_2: entry.fr_land_identifier_2 || "",
+            fr_land_identifier_3: entry.fr_land_identifier_3 || "",
+            fr_land_area: entry.fr_land_area || 0,
+            fr_area_unit: entry.fr_area_unit || "Acre",
+            fr_level_1_id: entry.landLocation?.level_1_name || "",
+            fr_level_2_id: entry.landLocation?.level_2_name || "",
+            fr_level_3_id: entry.landLocation?.level_3_name || "",
+            fr_level_4_id: entry.landLocation?.level_4_name || "",
+            fr_level_5_id: entry.landLocation?.level_5_name || "",
+            fr_level_6_id: entry.landLocation?.level_6_name || "",
+            match_score: entry.match_score ?? 0,
+            land_owner_name: entry.land_owner_name || "",
+          })),
         };
 
         try {
