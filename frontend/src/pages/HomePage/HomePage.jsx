@@ -22,6 +22,9 @@ const HomePage = () => {
       console.error('Login failed:', error);
     }
   };
+  const handleUserRedirect = () => {
+    window.location.href = 'http://localhost:3000/?role=user&redirect=/user';
+  };
 
   return (
     <div className="landing-container">
@@ -63,6 +66,19 @@ const HomePage = () => {
             </button>
           </div>
         </div>
+
+        <div className="login-card user-card">
+          <div className="card-content">
+            <div className="icon">
+              <i className="fas fa-user"></i>
+            </div>
+            <h2>User</h2>
+            <button className="login-btn user-btn" onClick={handleUserRedirect}>
+              Login as User
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );

@@ -60,6 +60,10 @@
   border-top: 4px solid #2196F3;
 }
 
+.user-card {
+  border-top: 4px solid #FFC107;
+}
+
 .card-content {
   padding: 1.5rem;
   text-align: center;
@@ -81,6 +85,10 @@
 
 .operator-card .icon {
   color: #2196F3;
+}
+
+.user-card .icon {
+  color: #FFC107;
 }
 
 .login-card h2 {
@@ -117,6 +125,16 @@
 .operator-btn:hover {
   background-color: #0b7dda;
 }
+
+.user-btn {
+  background-color: #FFC107;
+  color: white;
+}
+
+.user-btn:hover {
+  background-color: #e6b800;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
