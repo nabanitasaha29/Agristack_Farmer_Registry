@@ -1,7 +1,7 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './HomePage.css';
-import { useAuth } from '../../auth/useAuth'; // Consistent named import
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./HomePage.css";
+import { useAuth } from "../../auth/useAuth"; // Consistent named import
 
 const HomePage = () => {
   const { login } = useAuth();
@@ -9,21 +9,26 @@ const HomePage = () => {
 
   const handleFarmerLogin = async () => {
     try {
-      await login('farmer');
+      await login("farmer");
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
     }
   };
 
   const handleOperatorLogin = async () => {
     try {
-      await login('operator');
+      await login("operator");
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
     }
   };
+
   const handleUserRedirect = () => {
-    window.location.href = 'http://localhost:3000/?role=user&redirect=/user';
+    window.location.href = "http://localhost:3000/?role=user&redirect=/user";
+  };
+
+  const handleAdminRedirect = () => {
+    window.location.href = "http://localhost:3000/?role=admin&redirect=/admin";
   };
 
   return (
@@ -40,14 +45,17 @@ const HomePage = () => {
               <i className="fas fa-tractor"></i>
             </div>
             <h2>Farmer </h2>
-            <button className="login-btn farmer-btn" onClick={handleFarmerLogin}>
+            <button
+              className="login-btn farmer-btn"
+              onClick={handleFarmerLogin}
+            >
               Login as Farmer
             </button>
             <div className="register-section">
               <p className="register-text">Don't have an account?</p>
               <button
                 className="login-btn farmer-btn"
-                onClick={() => navigate('/register')}
+                onClick={() => navigate("/register")}
               >
                 Click Here to Register
               </button>
@@ -61,7 +69,10 @@ const HomePage = () => {
               <i className="fas fa-user-cog"></i>
             </div>
             <h2>Operator </h2>
-            <button className="login-btn operator-btn" onClick={handleOperatorLogin}>
+            <button
+              className="login-btn operator-btn"
+              onClick={handleOperatorLogin}
+            >
               Login as Operator
             </button>
           </div>
@@ -76,12 +87,20 @@ const HomePage = () => {
             <button className="login-btn user-btn" onClick={handleUserRedirect}>
               Login as User
             </button>
+            <h2>Admin</h2>
+            <button
+              className="login-btn user-btn"
+              onClick={handleAdminRedirect}
+            >
+              Login as Admin
+            </button>
           </div>
         </div>
-
       </div>
     </div>
   );
 };
 
 export default HomePage;
+
+
