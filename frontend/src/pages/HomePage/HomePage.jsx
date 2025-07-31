@@ -83,11 +83,11 @@ const HomePage = () => {
             <div className="icon">
               <i className="fas fa-user"></i>
             </div>
-            <h2>User</h2>
-            <button className="login-btn user-btn" onClick={handleUserRedirect}>
+            <h2 style={{ marginBottom: '2px' }}>User</h2>
+            <button  className="login-btn user-btn" onClick={handleUserRedirect}>
               Login as User
             </button>
-            <h2>Admin</h2>
+            <h2 style={{ marginBottom: '2px' }}>Admin</h2>
             <button
               className="login-btn user-btn"
               onClick={handleAdminRedirect}
