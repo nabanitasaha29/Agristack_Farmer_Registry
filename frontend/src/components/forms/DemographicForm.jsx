@@ -50,7 +50,7 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/location/postal-code-config")
+      .get("http://localhost:5001/api/location/postal-code-config")
       .then((res) => {
         setPostalCodeConfig(res.data.postalCodeConfig);
       });
@@ -94,11 +94,11 @@ const DemographicForm = forwardRef(({ onSubmit, initialValues }, ref) => {
       try {
         const [countryRes, mobileRes, idProofRes, socialCategoryRes, dateFormatRes] =
           await Promise.all([
-            fetch("http://localhost:5000/api/location/active-country"),
-            fetch("http://localhost:5000/api/location/mobile-code"),
-            fetch("http://localhost:5000/api/location/id-proof-types"),
-            fetch("http://localhost:5000/api/location/social-categories"),
-            fetch("http://localhost:5000/api/location/date-format"), // New
+            fetch("http://localhost:5001/api/location/active-country"),
+            fetch("http://localhost:5001/api/location/mobile-code"),
+            fetch("http://localhost:5001/api/location/id-proof-types"),
+            fetch("http://localhost:5001/api/location/social-categories"),
+            fetch("http://localhost:5001/api/location/date-format"), // New
           ]);
 
         const countryData = await countryRes.json();

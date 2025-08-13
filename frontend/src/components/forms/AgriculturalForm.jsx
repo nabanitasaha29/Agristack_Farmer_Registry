@@ -13,7 +13,7 @@ const AgriculturalForm = forwardRef(
 useEffect(() => {
   const fetchAreaUnit = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/location/area-unit");
+      const res = await axios.get("http://localhost:5001/api/location/area-unit");
       setAreaUnit(res.data?.areaUnit || "hectares");
     } catch (error) {
       console.error("Failed to fetch area unit:", error);

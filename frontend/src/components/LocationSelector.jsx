@@ -17,7 +17,7 @@
 //       setIsHierarchyLoading(true);
 //       try {
 //         const response = await axios.get(
-//           "http://localhost:5000/api/location/hierarchy"
+//           "http://localhost:5001/api/location/hierarchy"
 //         );
 //         if (response.data?.hierarchy) {
 //           const sortedLevels = response.data.hierarchy.sort(
@@ -72,7 +72,7 @@
 //     setLoadingLevel(levelName);
 //     try {
 //       const response = await axios.get(
-//         "http://localhost:5000/api/location/location-options",
+//         "http://localhost:5001/api/location/location-options",
 //         {
 //           params: {
 //             levelName,
@@ -207,7 +207,7 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
       setIsHierarchyLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/location/hierarchy"
+          "http://localhost:5001/api/location/hierarchy"
         );
         if (response.data?.hierarchy) {
           const sortedLevels = response.data.hierarchy.sort(
@@ -261,7 +261,7 @@ const LocationSelector = ({ form, fieldNamePrefix, onSelectionChange }) => {
     setLoadingLevel(levelName);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/location/location-options",
+        "http://localhost:5001/api/location/location-options",
         {
           params: {
             levelName,

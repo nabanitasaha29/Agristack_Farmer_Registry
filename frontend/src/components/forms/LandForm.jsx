@@ -77,11 +77,11 @@
 //           countryRes,
 //           fieldMappingsRes
 //         ] = await Promise.all([
-//           axios.get("http://localhost:5000/api/location/hierarchy"),
-//           axios.get("http://localhost:5000/api/location/land-identifiers"),
-//           axios.get("http://localhost:5000/api/location/area-unit"),
-//           axios.get("http://localhost:5000/api/location/active-country"),
-//           axios.get("http://localhost:5000/api/location/field-mappings")
+//           axios.get("http://localhost:5001/api/location/hierarchy"),
+//           axios.get("http://localhost:5001/api/location/land-identifiers"),
+//           axios.get("http://localhost:5001/api/location/area-unit"),
+//           axios.get("http://localhost:5001/api/location/active-country"),
+//           axios.get("http://localhost:5001/api/location/field-mappings")
 //         ]);
 
 //         setLocationHierarchy(
@@ -736,11 +736,11 @@ const LandForm = forwardRef(({ onSubmit, initialValues = {}, username }, ref) =>
           countryRes,
           fieldMappingsRes
         ] = await Promise.all([
-          axios.get("http://localhost:5000/api/location/hierarchy"),
-          axios.get("http://localhost:5000/api/location/land-identifiers"),
-          axios.get("http://localhost:5000/api/location/area-unit"),
-          axios.get("http://localhost:5000/api/location/active-country"),
-          axios.get("http://localhost:5000/api/location/field-mappings")
+          axios.get("http://localhost:5001/api/location/hierarchy"),
+          axios.get("http://localhost:5001/api/location/land-identifiers"),
+          axios.get("http://localhost:5001/api/location/area-unit"),
+          axios.get("http://localhost:5001/api/location/active-country"),
+          axios.get("http://localhost:5001/api/location/field-mappings")
         ]);
 
         setLocationHierarchy(

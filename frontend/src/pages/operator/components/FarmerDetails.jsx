@@ -44,10 +44,10 @@ const FarmerDetails = () => {
     const fetchConfigs = async () => {
       try {
         const [hierarchyRes, identifiersRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/location/hierarchy', {
+          axios.get('http://localhost:5001/api/location/hierarchy', {
             params: { country: farmer.fr_country },
           }),
-          axios.get('http://localhost:5000/api/location/land-identifiers', {
+          axios.get('http://localhost:5001/api/location/land-identifiers', {
             params: { country: farmer.fr_country }, // Optional if backend supports it
           }),
         ]);
